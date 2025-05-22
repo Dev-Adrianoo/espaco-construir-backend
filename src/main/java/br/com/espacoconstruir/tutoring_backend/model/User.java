@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 
 @Entity
-@Table(name = "guardian")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
