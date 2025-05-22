@@ -1,0 +1,34 @@
+package br.com.espacoconstruir.tutoring_backend.service;
+
+import br.com.espacoconstruir.tutoring_backend.model.User;
+import br.com.espacoconstruir.tutoring_backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public User register(User user) {
+        Optional<User> existing = UserRepository.findByEmail(user.getEmail());
+        if (existing.isPresent()) {
+            throw new RuntimeException("E-mail já está em uso.");
+
+        }
+        return userRepository.save(user);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+}

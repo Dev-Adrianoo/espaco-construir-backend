@@ -36,4 +36,7 @@ public class User {
     @OneToMany(mappedBy = "guardian", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Student> student = new ArrayList<>();
 
+    public Object getEmail() {
+        return null;
+    }
 }
