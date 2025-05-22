@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-
 @Service
 public class UserService {
 
@@ -15,7 +14,7 @@ public class UserService {
     private UserRepository userRepository;
 
     public User register(User user) {
-        Optional<User> existing = UserRepository.findByEmail(user.getEmail());
+        Optional<User> existing = userRepository.findByEmail(user.getEmail());
         if (existing.isPresent()) {
             throw new RuntimeException("E-mail já está em uso.");
 

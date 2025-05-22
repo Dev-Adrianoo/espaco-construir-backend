@@ -6,7 +6,6 @@ import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 
 @Service
@@ -23,7 +22,7 @@ public class StudentService {
         return studentRepository.findByGuardian(guardian);
     }
 
-    public User findById(Long id) {
+    public Student findById(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
     }
