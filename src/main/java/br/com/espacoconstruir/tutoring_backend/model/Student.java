@@ -26,4 +26,8 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "guardian_id", nullable = false)
     private User guardian;
+
+    //Future support for online classes
+    // @Enumerated(EnumType.STRING)
+    // private Modality modality;
 }
