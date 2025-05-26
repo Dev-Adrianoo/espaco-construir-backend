@@ -17,7 +17,6 @@ public class UserService {
         Optional<User> existing = userRepository.findByEmail(user.getEmail());
         if (existing.isPresent()) {
             throw new RuntimeException("E-mail já está em uso.");
-
         }
         return userRepository.save(user);
     }
@@ -29,5 +28,19 @@ public class UserService {
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    public User update(User user) {
+        if (!userRepository.existsById(user.getId())) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        return userRepository.save(user);
+    }
+
+    public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        userRepository.deleteById(id);
     }
 }

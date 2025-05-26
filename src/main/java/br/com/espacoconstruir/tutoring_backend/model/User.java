@@ -29,12 +29,13 @@ public class User {
     @Column(nullable = false)
     private String phone;
 
+    @Column(unique = true)
+    private String cnpj;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     // Relacionamento 1:N com student
     @OneToMany(mappedBy = "guardian", cascade = CascadeType.ALL, orphanRemoval = true)
-
     private List<Student> student = new ArrayList<>();
-
 }
