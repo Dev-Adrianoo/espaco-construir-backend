@@ -38,4 +38,5 @@ public class User {
     // Relacionamento 1:N com student
     @OneToMany(mappedBy = "guardian", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Student> student = new ArrayList<>();
+
 }
