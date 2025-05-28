@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore custom security config
+src/main/java/br/com/espacoconstruir/tutoring_backend/config/SecurityConfig.java
