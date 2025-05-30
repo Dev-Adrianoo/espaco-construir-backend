@@ -17,7 +17,7 @@ public class GuardianDTO {
     private String password;
 
     @NotBlank(message = "Telefone é obrigatório")
-    @Pattern(regexp = "^\\+?[1-9][0-9]{10,14}$", message = "Telefone inválido")
+    @Pattern(regexp = "^\\+?[1-9][0-9]{9,14}$", message = "Telefone inválido")
     private String phone;
 
     public GuardianDTO() {

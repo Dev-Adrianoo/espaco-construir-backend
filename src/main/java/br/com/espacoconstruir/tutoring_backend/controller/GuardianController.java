@@ -1,12 +1,19 @@
 package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.GuardianDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.GuardianResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
+import br.com.espacoconstruir.tutoring_backend.service.StudentService;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
+import br.com.espacoconstruir.tutoring_backend.service.ClassService;
+import br.com.espacoconstruir.tutoring_backend.model.Class;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/guardians")
@@ -16,7 +23,13 @@ public class GuardianController {
   @Autowired
   private UserService userService;
 
-  @PostMapping("/register")
+  @Autowired
+  private ClassService classService;
+
+  @Autowired
+  private StudentService studentService;
+
+  @PostMapping
   public ResponseEntity<?> createGuardian(@Valid @RequestBody GuardianDTO dto) {
     try {
       User user = new User();
@@ -64,5 +77,27 @@ public class GuardianController {
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
+  }
+
+  @GetMapping
+  public ResponseEntity<List<GuardianResponseDTO>> listAllGuardians() {
+    List<User> guardians = userService.findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.RESPONSAVEL);
+    List<GuardianResponseDTO> response = guardians.stream()
+        .map(g -> new GuardianResponseDTO(g.getId(), g.getName(), g.getEmail(), g.getPhone()))
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/history")
+  public ResponseEntity<List<Class>> getClassHistory(@RequestParam Long alunoId) {
+    List<Class> history = classService.getHistoryByStudent(alunoId);
+    return ResponseEntity.ok(history);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<Student>> getChildrenByResponsible(@RequestParam Long responsavelId) {
+    User guardian = userService.findById(responsavelId);
+    List<Student> students = studentService.getByGuardian(guardian);
+    return ResponseEntity.ok(students);
   }
 }

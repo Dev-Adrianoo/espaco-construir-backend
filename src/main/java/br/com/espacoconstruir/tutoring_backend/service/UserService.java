@@ -43,4 +43,8 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
+    public java.util.List<User> findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role role) {
+        return userRepository.findByRole(role);
+    }
 }
