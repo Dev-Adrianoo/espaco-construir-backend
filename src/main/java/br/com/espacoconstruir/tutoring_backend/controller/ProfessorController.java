@@ -1,6 +1,7 @@
 package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.TeacherDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.TeacherResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +46,12 @@ public class ProfessorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TeacherDTO>> listAllProfessors() {
+    public ResponseEntity<List<TeacherResponseDTO>> listAllProfessors() {
         List<User> professors = userService
                 .findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.PROFESSORA);
-        List<TeacherDTO> response = professors.stream()
-                .map(p -> {
-                    TeacherDTO dto = new TeacherDTO(p.getName(), p.getEmail(), p.getPassword(), p.getPhone(),
-                            p.getCnpj());
-                    return dto;
-                })
+        List<TeacherResponseDTO> response = professors.stream()
+                .map(p -> new TeacherResponseDTO(p.getId(), p.getName(), p.getEmail(), p.getPhone(), p.getCnpj(),
+                        p.getRole()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
