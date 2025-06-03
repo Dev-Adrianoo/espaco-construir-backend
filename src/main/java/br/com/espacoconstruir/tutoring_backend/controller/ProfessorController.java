@@ -6,6 +6,8 @@ import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/professors")
@@ -29,6 +31,20 @@ public class ProfessorController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getProfessor(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TeacherDTO>> listAllProfessors() {
+        List<User> professors = userService
+                .findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.PROFESSORA);
+        List<TeacherDTO> response = professors.stream()
+                .map(p -> {
+                    TeacherDTO dto = new TeacherDTO(p.getName(), p.getEmail(), p.getPassword(), p.getPhone(),
+                            p.getCnpj());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
