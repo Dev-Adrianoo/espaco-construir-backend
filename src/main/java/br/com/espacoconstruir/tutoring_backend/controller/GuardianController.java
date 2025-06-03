@@ -29,8 +29,8 @@ public class GuardianController {
   @Autowired
   private StudentService studentService;
 
-  @PostMapping
-  public ResponseEntity<?> createGuardian(@Valid @RequestBody GuardianDTO dto) {
+  @PostMapping("/register")
+  public ResponseEntity<?> registerGuardian(@Valid @RequestBody GuardianDTO dto) {
     try {
       User user = new User();
       user.setName(dto.getName());
@@ -94,7 +94,7 @@ public class GuardianController {
     return ResponseEntity.ok(history);
   }
 
-  @GetMapping
+  @GetMapping("/children")
   public ResponseEntity<List<Student>> getChildrenByResponsible(@RequestParam Long responsavelId) {
     User guardian = userService.findById(responsavelId);
     List<Student> students = studentService.getByGuardian(guardian);
