@@ -3,7 +3,7 @@
 ## Visão Geral
 Este projeto é o backend de um sistema de tutoria, desenvolvido em Java com Spring Boot. Ele gerencia responsáveis, alunos, aulas e histórico de aulas.
 
----
+----
 
 ## Estrutura do Projeto
 
@@ -13,7 +13,7 @@ Este projeto é o backend de um sistema de tutoria, desenvolvido em Java com Spr
 - **dto/**: Objetos de transferência de dados (ex: GuardianDTO, GuardianResponseDTO)
 - **repository/**: Interfaces para acesso ao banco de dados
 
----
+----
 
 ## Endpoints Principais
 
