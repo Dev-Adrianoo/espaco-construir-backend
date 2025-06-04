@@ -2,7 +2,7 @@ spring:
   application:
     name: espaco-construir-backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/tutoring_backend
+    url: jdbc:postgresql://localhost:5432/tutoring_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
