@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.espacoconstruir</groupId>
-	<artifactId>tutoring-backend</artifactId>
+	<artifactId>espaco-construir-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>espaco-construir-backend</name>
 	<description>Backend da plataforma Espaço Construir</description>

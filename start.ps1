@@ -1,3 +1,13 @@
+chcp 65001 > $null
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+Write-Host ""
+$line = "====================================================="
+Write-Host $line -ForegroundColor DarkCyan
+Write-Host "        ESPACO CONSTRUIR BACKEND - DEV ENV           " -ForegroundColor Cyan
+Write-Host $line -ForegroundColor DarkCyan
+Write-Host ""
+
 function Test-PostgresConnection {
   try {
     $result = docker exec tutoring_db pg_isready
@@ -8,35 +18,44 @@ function Test-PostgresConnection {
   }
 }
 
-Write-Host ">>> Iniciando container Docker do PostgreSQL..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Iniciando servicos Docker com Docker Compose..." -ForegroundColor Cyan
+docker-compose up -d > $null 2>&1
 
-$containerExists = docker ps -a --filter "name=tutoring_db" --format "{{.Names}}"
-
-if ($containerExists) {
-  Write-Host ">>> Container tutoring_db ja existe, iniciando..." -ForegroundColor Yellow
-  docker start tutoring_db
-}
-else {
-  Write-Host ">>> Criando novo container tutoring_db..." -ForegroundColor Green
-  docker run --name tutoring_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=tutoring_db -p 5432:5432 -d postgres:15
-}
-
-Write-Host ">>> Aguardando PostgreSQL ficar pronto..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Aguardando PostgreSQL ficar pronto..." -ForegroundColor Cyan
+Start-Sleep -Seconds 5
 $attempts = 0
-$maxAttempts = 30
+$maxAttempts = 60
 
 while (-not (Test-PostgresConnection)) {
   $attempts++
   if ($attempts -ge $maxAttempts) {
-    Write-Host ">>> ERRO: Tempo limite excedido aguardando PostgreSQL" -ForegroundColor Red
+    Write-Host "ERRO: Tempo limite excedido aguardando PostgreSQL" -ForegroundColor Red
     exit 1
   }
   Write-Host "." -NoNewline
   Start-Sleep -Seconds 1
 }
 
-Write-Host "`n>>> PostgreSQL esta pronto!" -ForegroundColor Green
-Write-Host ">>> Iniciando aplicacao Spring Boot..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "PostgreSQL esta pronto!" -ForegroundColor Green
+Write-Host ""
 
-# Inicia a aplicação Spring Boot
-./mvnw spring-boot:run 
+Write-Host "Garantindo que o banco tutoring_db existe..." -ForegroundColor Cyan
+$checkDb = docker exec tutoring_db psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='tutoring_db'"
+if ($checkDb -ne "1") {
+  docker exec tutoring_db psql -U postgres -c "CREATE DATABASE tutoring_db"
+  Write-Host "Banco tutoring_db criado." -ForegroundColor Green
+} else {
+  Write-Host "Banco tutoring_db ja existe." -ForegroundColor Yellow
+}
+Write-Host ""
+
+Write-Host "Iniciando aplicacao Spring Boot..." -ForegroundColor Cyan
+Write-Host $line -ForegroundColor DarkCyan
+Write-Host ""
+
+Start-Sleep -Seconds 5
+
+./mvnw spring-boot:run
