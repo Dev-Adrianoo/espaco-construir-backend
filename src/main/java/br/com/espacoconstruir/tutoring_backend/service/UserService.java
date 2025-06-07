@@ -3,6 +3,7 @@ package br.com.espacoconstruir.tutoring_backend.service;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,11 +14,15 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public User register(User user) {
         Optional<User> existing = userRepository.findByEmail(user.getEmail());
         if (existing.isPresent()) {
             throw new RuntimeException("E-mail já está em uso.");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -33,6 +38,9 @@ public class UserService {
     public User update(User user) {
         if (!userRepository.existsById(user.getId())) {
             throw new RuntimeException("Usuário não encontrado");
+        }
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         return userRepository.save(user);
     }
