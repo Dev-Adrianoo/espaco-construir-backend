@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 
 @RestController
 @RequestMapping("/api/guardians")
@@ -37,7 +38,7 @@ public class GuardianController {
       user.setEmail(dto.getEmail());
       user.setPassword(dto.getPassword());
       user.setPhone(dto.getPhone());
-      user.setRole(dto.getRole());
+      user.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.RESPONSAVEL);
 
       User savedUser = userService.register(user);
       return ResponseEntity.ok(savedUser);
@@ -63,6 +64,9 @@ public class GuardianController {
       user.setName(dto.getName());
       user.setEmail(dto.getEmail());
       user.setPhone(dto.getPhone());
+      if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+        user.setPassword(dto.getPassword());
+      }
       return ResponseEntity.ok(userService.update(user));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -95,9 +99,26 @@ public class GuardianController {
   }
 
   @GetMapping("/children")
-  public ResponseEntity<List<Student>> getChildrenByResponsible(@RequestParam Long responsavelId) {
+  public ResponseEntity<List<StudentResponseDTO>> getChildrenByResponsible(@RequestParam Long responsavelId) {
     User guardian = userService.findById(responsavelId);
     List<Student> students = studentService.getByGuardian(guardian);
-    return ResponseEntity.ok(students);
+    List<StudentResponseDTO> response = students.stream()
+        .map(s -> new StudentResponseDTO(
+            s.getId(),
+            s.getName(),
+            null,
+            null,
+            s.getAge(),
+            s.getGrade(),
+            s.getCondition(),
+            s.getDifficulties(),
+            br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO,
+            guardian.getId(),
+            null,
+            null,
+            null,
+            new GuardianDTO(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getPhone())))
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(response);
   }
 }

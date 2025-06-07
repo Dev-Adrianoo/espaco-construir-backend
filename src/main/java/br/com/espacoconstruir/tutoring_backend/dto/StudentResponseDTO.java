@@ -1,37 +1,46 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
 import java.time.LocalDateTime;
+import br.com.espacoconstruir.tutoring_backend.model.Role;
 
 public class StudentResponseDTO {
   private Long id;
   private String name;
+  private String email;
+  private String phone;
   private Integer age;
   private String grade;
-  private String difficulties;
   private String condition;
+  private String difficulties;
+  private Role role;
   private Long guardianId;
   private Long registeredBy;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private GuardianDTO guardian;
 
   // Constructor vazio
   public StudentResponseDTO() {
   }
 
   // Constructor com todos os campos
-  public StudentResponseDTO(Long id, String name, Integer age, String grade,
-      String difficulties, String condition, Long guardianId,
-      Long registeredBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public StudentResponseDTO(Long id, String name, String email, String phone, Integer age,
+      String grade, String condition, String difficulties, Role role, Long guardianId,
+      Long registeredBy, LocalDateTime createdAt, LocalDateTime updatedAt, GuardianDTO guardian) {
     this.id = id;
     this.name = name;
+    this.email = email;
+    this.phone = phone;
     this.age = age;
     this.grade = grade;
-    this.difficulties = difficulties;
     this.condition = condition;
+    this.difficulties = difficulties;
+    this.role = role;
     this.guardianId = guardianId;
     this.registeredBy = registeredBy;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.guardian = guardian;
   }
 
   // Getters e setters
@@ -51,6 +60,22 @@ public class StudentResponseDTO {
     this.name = name;
   }
 
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
   public Integer getAge() {
     return age;
   }
@@ -67,6 +92,14 @@ public class StudentResponseDTO {
     this.grade = grade;
   }
 
+  public String getCondition() {
+    return condition;
+  }
+
+  public void setCondition(String condition) {
+    this.condition = condition;
+  }
+
   public String getDifficulties() {
     return difficulties;
   }
@@ -75,12 +108,12 @@ public class StudentResponseDTO {
     this.difficulties = difficulties;
   }
 
-  public String getCondition() {
-    return condition;
+  public Role getRole() {
+    return role;
   }
 
-  public void setCondition(String condition) {
-    this.condition = condition;
+  public void setRole(Role role) {
+    this.role = role;
   }
 
   public Long getGuardianId() {
@@ -113,5 +146,13 @@ public class StudentResponseDTO {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public GuardianDTO getGuardian() {
+    return guardian;
+  }
+
+  public void setGuardian(GuardianDTO guardian) {
+    this.guardian = guardian;
   }
 }

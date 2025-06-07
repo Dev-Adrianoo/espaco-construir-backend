@@ -84,8 +84,7 @@ src/main/resources/db/migration/
 ├── V1__Initial_Schema.sql
 ├── V2__Create_Core_Tables.sql
 ├── V3__Add_Triggers_And_Indexes.sql
-├── V4__Create_Classes_Table.sql
-└── V5__Create_Teachers_Table.sql
+└── V4__Create_Classes_Table.sql
 ```
 
 ---

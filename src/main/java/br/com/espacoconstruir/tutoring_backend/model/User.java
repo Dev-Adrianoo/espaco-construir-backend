@@ -4,7 +4,9 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 
@@ -38,5 +40,23 @@ public class User {
     // Relacionamento 1:N com student
     @OneToMany(mappedBy = "guardian", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Student> student = new ArrayList<>();
+
+    // Campos específicos do aluno
+    @Transient
+    @Getter
+    @Setter
+    private Integer age;
+    @Transient
+    @Getter
+    @Setter
+    private String grade;
+    @Transient
+    @Getter
+    @Setter
+    private String condition;
+    @Transient
+    @Getter
+    @Setter
+    private String difficulties;
 
 }
