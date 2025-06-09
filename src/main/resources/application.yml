@@ -21,7 +21,7 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: false
     clean-disabled: false
-    clean-on-validation-error: true
+    clean-on-validation-error: false
     out-of-order: true
     ignore-missing-migrations: true
     ignore-future-migrations: true

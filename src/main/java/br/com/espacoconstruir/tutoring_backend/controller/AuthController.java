@@ -2,6 +2,7 @@ package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.AuthRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.AuthResponseDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.TokenRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.service.JwtService;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
@@ -37,16 +38,39 @@ public class AuthController {
 
             String token = jwtService.generateToken(user.getEmail());
             AuthResponseDTO response = new AuthResponseDTO(
-                token,
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole()
-            );
+                    token,
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole());
 
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-} 
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyToken(@RequestBody TokenRequestDTO request) {
+        try {
+            String email = jwtService.extractUsername(request.getToken());
+            if (email == null || !jwtService.validateToken(request.getToken(), userService.loadUserByUsername(email))) {
+                return ResponseEntity.badRequest().body("Token inválido ou expirado");
+            }
+
+            User user = userService.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+            AuthResponseDTO response = new AuthResponseDTO(
+                    request.getToken(),
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao verificar token: " + e.getMessage());
+        }
+    }
+}
