@@ -11,6 +11,8 @@ import br.com.espacoconstruir.tutoring_backend.model.Class;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,11 +87,16 @@ public class GuardianController {
 
   @GetMapping
   public ResponseEntity<List<GuardianResponseDTO>> listAllGuardians() {
-    List<User> guardians = userService.findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.RESPONSAVEL);
-    List<GuardianResponseDTO> response = guardians.stream()
-        .map(g -> new GuardianResponseDTO(g.getId(), g.getName(), g.getEmail(), g.getPhone()))
-        .collect(Collectors.toList());
-    return ResponseEntity.ok(response);
+    try {
+      List<User> guardians = userService.findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.RESPONSAVEL);
+      List<GuardianResponseDTO> response = guardians.stream()
+          .map(g -> new GuardianResponseDTO(g.getId(), g.getName(), g.getEmail(), g.getPhone()))
+          .collect(Collectors.toList());
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      System.out.println("Error listing guardians: " + e.getMessage());
+      return ResponseEntity.status(500).body(List.of());
+    }
   }
 
   @GetMapping("/history")
@@ -99,26 +106,53 @@ public class GuardianController {
   }
 
   @GetMapping("/children")
-  public ResponseEntity<List<StudentResponseDTO>> getChildrenByResponsible(@RequestParam Long responsavelId) {
-    User guardian = userService.findById(responsavelId);
-    List<Student> students = studentService.getByGuardian(guardian);
-    List<StudentResponseDTO> response = students.stream()
-        .map(s -> new StudentResponseDTO(
-            s.getId(),
-            s.getName(),
-            null,
-            null,
-            s.getAge(),
-            s.getGrade(),
-            s.getCondition(),
-            s.getDifficulties(),
-            br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO,
+  public ResponseEntity<List<StudentResponseDTO>> getChildrenByResponsible(
+      @RequestParam(required = false) Long responsavelId) {
+    try {
+      if (responsavelId == null) {
+        return ResponseEntity.badRequest().body(List.of());
+      }
+
+      User guardian = userService.findById(responsavelId);
+      List<Student> students = studentService.getByGuardian(guardian);
+      List<StudentResponseDTO> response = students.stream()
+          .map(s -> new StudentResponseDTO(
+              s.getId(),
+              s.getName(),
+              null,
+              null,
+              s.getAge(),
+              s.getGrade(),
+              s.getCondition(),
+              s.getDifficulties(),
+              br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO,
+              guardian.getId(),
+              null,
+              null,
+              null,
+              new GuardianDTO(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getPhone())))
+          .collect(Collectors.toList());
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      System.out.println("Error getting children: " + e.getMessage());
+      return ResponseEntity.status(500).body(List.of());
+    }
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<?> getCurrentGuardian() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+      return ResponseEntity.status(401).body("User not authenticated");
+    }
+
+    String email = auth.getName();
+    return userService.findByEmail(email)
+        .map(guardian -> ResponseEntity.ok(new GuardianResponseDTO(
             guardian.getId(),
-            null,
-            null,
-            null,
-            new GuardianDTO(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getPhone())))
-        .collect(Collectors.toList());
-    return ResponseEntity.ok(response);
+            guardian.getName(),
+            guardian.getEmail(),
+            guardian.getPhone())))
+        .orElse(ResponseEntity.notFound().build());
   }
 }

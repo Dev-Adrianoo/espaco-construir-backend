@@ -19,12 +19,12 @@ Este projeto é o backend de um sistema de tutoria, desenvolvido em Java com Spr
 
 ## Estrutura do Projeto
 
-- **controller/**: Endpoints REST (GuardianController, ProfessorController)
-- **service/**: Lógica de negócio (UserService, StudentService, ScheduleService)
+- **controller/**: Endpoints REST (AuthController, GuardianController, StudentController, ScheduleController)
+- **service/**: Lógica de negócio (UserService, StudentService, ScheduleService, JwtService)
 - **model/**: Entidades JPA (User, Student, Schedule)
-- **dto/**: Objetos de transferência de dados (GuardianDTO, TeacherDTO)
+- **dto/**: Objetos de transferência de dados (AuthRequestDTO, AuthResponseDTO, GuardianDTO, StudentDTO, ScheduleDTO)
 - **repository/**: Interfaces para acesso ao banco de dados
-- **config/**: Configurações do Spring Boot
+- **config/**: Configurações do Spring Boot e Security
 - **resources/db/migration/**: Arquivos de migração do Flyway
 
 ---
@@ -73,7 +73,21 @@ O projeto usa PostgreSQL com as seguintes tabelas:
   - Campos: id, name, age, grade, difficulties, condition, guardian_id, registered_by, created_at, updated_at
 
 - `schedules`: Agendamentos
-  - Campos: id, student_id, teacher_id, start_time, end_time, status, modality, created_at, created_by, last_modified_by, last_modified_at
+  - Campos:
+    - id: Identificador único
+    - student_id: ID do aluno (ref: students)
+    - teacher_id: ID do professor (ref: users)
+    - start_time: Data/hora início
+    - end_time: Data/hora fim
+    - status: Status do agendamento (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
+    - modality: Modalidade (ONLINE, IN_PERSON, HYBRID)
+    - description: Descrição da aula
+    - subject: Matéria/disciplina
+    - meeting_link: Link para aula online
+    - created_at: Data de criação
+    - created_by: Usuário que criou
+    - last_modified_by: Último usuário que modificou
+    - last_modified_at: Data da última modificação
 
 ### Migrações (Flyway)
 
@@ -84,7 +98,8 @@ src/main/resources/db/migration/
 ├── V1__Initial_Schema.sql
 ├── V2__Create_Core_Tables.sql
 ├── V3__Add_Triggers_And_Indexes.sql
-└── V4__Create_Classes_Table.sql
+├── V4__Create_Classes_Table.sql
+└── V5__Add_Missing_Columns_To_Schedules.sql
 ```
 
 ---
@@ -95,6 +110,7 @@ src/main/resources/db/migration/
 
 - `POST /api/auth/login`: Login de usuários
 - `POST /api/auth/register`: Registro de novos usuários
+- `POST /api/auth/refresh`: Renovar token JWT
 
 ### Responsáveis (Guardians)
 
@@ -127,6 +143,9 @@ src/main/resources/db/migration/
 - `GET /api/schedules/{id}`: Buscar agendamento por ID
 - `PUT /api/schedules/{id}`: Atualizar agendamento
 - `DELETE /api/schedules/{id}`: Cancelar agendamento
+- `POST /api/schedules/book`: Agendar aula
+- `GET /api/schedules/teacher/{id}`: Listar agendamentos do professor
+- `GET /api/schedules/student/{id}`: Listar agendamentos do aluno
 
 ---
 
@@ -150,6 +169,7 @@ src/main/resources/db/migration/
 - Todos os endpoints estão sob `/api/*`
 - As respostas são em formato JSON
 - Consulte os logs do Spring Boot para debugging
+- Use o token JWT no header `Authorization: Bearer <token>`
 
 ---
 

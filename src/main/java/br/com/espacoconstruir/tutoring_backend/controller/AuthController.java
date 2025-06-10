@@ -9,6 +9,7 @@ import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -36,7 +37,8 @@ public class AuthController {
                 return ResponseEntity.badRequest().body("Senha incorreta");
             }
 
-            String token = jwtService.generateToken(user.getEmail());
+            UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
+            String token = jwtService.generateToken(userDetails);
             AuthResponseDTO response = new AuthResponseDTO(
                     token,
                     user.getId(),
@@ -54,7 +56,9 @@ public class AuthController {
     public ResponseEntity<?> verifyToken(@RequestBody TokenRequestDTO request) {
         try {
             String email = jwtService.extractUsername(request.getToken());
-            if (email == null || !jwtService.validateToken(request.getToken(), userService.loadUserByUsername(email))) {
+            UserDetails userDetails = userService.loadUserByUsername(email);
+
+            if (email == null || !jwtService.isTokenValid(request.getToken(), userDetails)) {
                 return ResponseEntity.badRequest().body("Token inválido ou expirado");
             }
 
