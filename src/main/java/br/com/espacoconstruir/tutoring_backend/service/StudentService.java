@@ -65,16 +65,16 @@ public class StudentService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        
+
         Student student = studentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
-        
+                .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
+
         student.setName(dto.getName());
         student.setAge(dto.getAge());
         student.setGrade(dto.getGrade());
         student.setCondition(dto.getCondition());
         student.setDifficulties(dto.getDifficulties());
-        
+
         studentRepository.save(student);
         return userService.update(user);
     }
