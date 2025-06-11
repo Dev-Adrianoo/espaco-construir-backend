@@ -10,9 +10,15 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.HttpStatus;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @RestController
-@RequestMapping("/api/professors")
+@RequestMapping("/api/teachers")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProfessorController {
 
@@ -21,6 +27,9 @@ public class ProfessorController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerProfessor(@Valid @RequestBody TeacherDTO dto) {
+        System.out.println("ProfessorController: Recebida requisição para registrar professor.");
+        System.out.println("Dados recebidos: " + dto.getName() + ", " + dto.getEmail() + ", " + dto.getPhone() + ", "
+                + dto.getCnpj());
         try {
             User user = new User();
             user.setName(dto.getName());
@@ -29,10 +38,34 @@ public class ProfessorController {
             user.setPhone(dto.getPhone());
             user.setCnpj(dto.getCnpj());
             user.setRole(dto.getRole());
+            System.out.println("ProfessorController: Objeto User criado para registro.");
             return ResponseEntity.ok(userService.register(user));
         } catch (RuntimeException e) {
+            System.err.println("ProfessorController: Erro capturado em registerProfessor: " + e.getMessage());
+            e.printStackTrace(); // Imprime o stack trace completo
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) { // Captura qualquer outra exceção genérica
+            System.err.println(
+                    "ProfessorController: Exceção inesperada capturada em registerProfessor: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro interno no servidor: " + e.getMessage());
         }
+    }
+
+    // New exception handler for validation errors
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        System.err.println("ProfessorController: Erro de validação capturado.");
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((org.springframework.validation.FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+            System.err.println("Erro de validação - Campo: " + fieldName + ", Mensagem: " + errorMessage);
+        });
+        return errors;
     }
 
     @GetMapping("/{id}")
@@ -54,6 +87,29 @@ public class ProfessorController {
                         p.getRole()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe() {
+        try {
+            Long authenticatedUserId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                    .getId();
+            User professor = userService.findById(authenticatedUserId);
+            TeacherResponseDTO response = new TeacherResponseDTO(
+                    professor.getId(),
+                    professor.getName(),
+                    professor.getEmail(),
+                    professor.getPhone(),
+                    professor.getCnpj(),
+                    professor.getRole());
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Professor not found.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching authenticated professor: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

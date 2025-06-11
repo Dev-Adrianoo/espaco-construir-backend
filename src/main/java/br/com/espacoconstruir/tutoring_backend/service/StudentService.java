@@ -18,6 +18,9 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private ScheduleService scheduleService;
+
     public User register(StudentDTO dto) {
         // 1. Criar usuário
         User user = new User();
@@ -58,6 +61,10 @@ public class StudentService {
 
     public List<User> findAll() {
         return userService.findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
+    }
+
+    public List<User> findByTeacherId(Long teacherId) {
+        return scheduleService.getStudentsByTeacherId(teacherId);
     }
 
     public User update(Long id, StudentDTO dto) {

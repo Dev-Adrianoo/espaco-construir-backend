@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/students")
@@ -60,6 +61,34 @@ public class StudentController {
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/teacher/{teacherId}")
+    public ResponseEntity<List<StudentResponseDTO>> getStudentsByTeacherId(@PathVariable Long teacherId) {
+        try {
+            List<User> students = studentService.findByTeacherId(teacherId);
+            List<StudentResponseDTO> response = students.stream()
+                    .map(s -> new StudentResponseDTO(
+                            s.getId(),
+                            s.getName(),
+                            s.getEmail(),
+                            s.getPhone(),
+                            null, // age
+                            null, // grade
+                            null, // condition
+                            null, // difficulties
+                            s.getRole(),
+                            null, // guardianId
+                            null, // registeredBy
+                            null, // createdAt
+                            null, // updatedAt
+                            null // guardian
+                    ))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Collections.emptyList());
+        }
     }
 
     @PutMapping("/{id}")

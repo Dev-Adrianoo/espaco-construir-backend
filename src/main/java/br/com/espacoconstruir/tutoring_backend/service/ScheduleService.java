@@ -126,6 +126,13 @@ public class ScheduleService {
         .collect(Collectors.toList());
   }
 
+  public List<User> getStudentsByTeacherId(Long teacherId) {
+    return scheduleRepository.findByTeacherId(teacherId).stream()
+        .map(Schedule::getStudent)
+        .distinct()
+        .collect(Collectors.toList());
+  }
+
   @Transactional
   public ScheduleDTO updateScheduleStatus(Long scheduleId, ScheduleStatus newStatus) {
     Schedule schedule = scheduleRepository.findById(scheduleId)
