@@ -35,7 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String jwt;
     final String userEmail;
 
+    System.out.println("Entering JwtAuthenticationFilter for request: " + request.getRequestURI());
+
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      System.out.println("No JWT found or invalid format. Proceeding with filter chain.");
       filterChain.doFilter(request, response);
       return;
     }
@@ -47,13 +50,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       UserDetails userDetails = userService.loadUserByUsername(userEmail);
 
       if (jwtService.isTokenValid(jwt, userDetails)) {
+        System.out.println("JWT is valid. Setting authentication context.");
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
             userDetails.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+      } else {
+        System.out.println("JWT is NOT valid for user: " + userEmail);
       }
+    } else {
+      System.out.println("User email is null or authentication already set.");
     }
 
     filterChain.doFilter(request, response);

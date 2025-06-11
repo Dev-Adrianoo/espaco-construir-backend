@@ -18,7 +18,7 @@ public class Schedule {
   private User student;
 
   @ManyToOne
-  @JoinColumn(name = "teacher_id", nullable = false)
+  @JoinColumn(name = "teacher_id", nullable = true)
   private User teacher;
 
   @Column(nullable = false)
@@ -40,10 +40,7 @@ public class Schedule {
   @Column
   private String meetingLink;
 
-  public enum ScheduleStatus {
-    SCHEDULED,
-    IN_PROGRESS,
-    COMPLETED,
-    CANCELLED
-  }
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private ScheduleModality modality;
 }

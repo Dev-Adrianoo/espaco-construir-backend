@@ -2,7 +2,7 @@ package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.BookingRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.ScheduleDTO;
-import br.com.espacoconstruir.tutoring_backend.model.Schedule;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
 import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ public class ScheduleController {
     @PutMapping("/{scheduleId}/status")
     public ResponseEntity<ScheduleDTO> updateScheduleStatus(
             @PathVariable Long scheduleId,
-            @RequestParam Schedule.ScheduleStatus status) {
+            @RequestParam ScheduleStatus status) {
         return ResponseEntity.ok(scheduleService.updateScheduleStatus(scheduleId, status));
     }
 
@@ -49,4 +49,4 @@ public class ScheduleController {
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.ok().build();
     }
-} 
+}

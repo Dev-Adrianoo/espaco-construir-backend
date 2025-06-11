@@ -1,6 +1,7 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
-import br.com.espacoconstruir.tutoring_backend.model.Schedule;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class ScheduleDTO {
     private LocalDateTime endTime;
     private String subject;
     private String description;
-    private Schedule.ScheduleStatus status;
+    private ScheduleStatus status;
     private String meetingLink;
-} 
+    private ScheduleModality modality;
+}
