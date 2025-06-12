@@ -18,4 +18,5 @@ public class ScheduleDTO {
     private ScheduleStatus status;
     private String meetingLink;
     private ScheduleModality modality;
+    private String studentName;
 }

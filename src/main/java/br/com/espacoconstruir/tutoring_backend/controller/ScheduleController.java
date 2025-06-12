@@ -49,4 +49,9 @@ public class ScheduleController {
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping
+    public ResponseEntity<List<ScheduleDTO>> getAllSchedules() {
+        return ResponseEntity.ok(scheduleService.getAllSchedules());
+    }
 }

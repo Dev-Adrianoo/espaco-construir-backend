@@ -8,6 +8,7 @@ import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.repository.ScheduleRepository;
+import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class ScheduleService {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private StudentRepository studentRepository;
 
   @Transactional
   public ScheduleDTO createBooking(BookingRequestDTO bookingRequest) {
@@ -58,7 +62,6 @@ public class ScheduleService {
       throw new RuntimeException("Student already has a schedule in this time slot");
     }
 
-    // Check for teacher scheduling conflicts only if a teacher is assigned
     if (teacher != null && scheduleRepository.existsByTeacherIdAndStartTimeBetween(
         teacher.getId(), startTime, endTime)) {
       throw new RuntimeException("Teacher already has a schedule in this time slot");
@@ -146,10 +149,21 @@ public class ScheduleService {
     scheduleRepository.deleteById(scheduleId);
   }
 
+  public List<ScheduleDTO> getAllSchedules() {
+    return scheduleRepository.findAll()
+        .stream()
+        .map(this::convertToDTO)
+        .collect(Collectors.toList());
+  }
+
   private ScheduleDTO convertToDTO(Schedule schedule) {
     ScheduleDTO dto = new ScheduleDTO();
     dto.setId(schedule.getId());
     dto.setStudentId(schedule.getStudent().getId());
+    studentRepository.findById(schedule.getStudent().getId())
+        .ifPresentOrElse(
+            student -> dto.setStudentName(student.getName()),
+            () -> dto.setStudentName("(Aluno não encontrado)"));
     dto.setTeacherId(schedule.getTeacher() != null ? schedule.getTeacher().getId() : null);
     dto.setStartTime(schedule.getStartTime());
     dto.setEndTime(schedule.getEndTime());

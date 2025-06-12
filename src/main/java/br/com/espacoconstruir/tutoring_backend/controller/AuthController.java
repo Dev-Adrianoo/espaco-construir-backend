@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -75,6 +77,34 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erro ao verificar token: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody TokenRequestDTO request) {
+        try {
+            String email = jwtService.extractUsername(request.getToken());
+            UserDetails userDetails = userService.loadUserByUsername(email);
+            if (email == null || !jwtService.isRefreshTokenValid(request.getToken(), userDetails)) {
+                return ResponseEntity.badRequest().body("Refresh token inválido ou expirado");
+            }
+            User user = userService.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            String newAccessToken = jwtService.generateToken(userDetails);
+            String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+            AuthResponseDTO response = new AuthResponseDTO(
+                    newAccessToken,
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole());
+            Map<String, Object> result = new HashMap<>();
+            result.put("accessToken", newAccessToken);
+            result.put("refreshToken", newRefreshToken);
+            result.put("user", response);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao renovar token: " + e.getMessage());
         }
     }
 }

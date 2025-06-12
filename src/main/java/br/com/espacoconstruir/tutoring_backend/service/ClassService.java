@@ -9,7 +9,7 @@ import java.util.List;
 public class ClassService {
   // Implement methods as needed
   public List<Class> getHistoryByStudent(Long alunoId) {
-    // TODO: Implement actual logic
+    
     return Collections.emptyList();
   }
 }

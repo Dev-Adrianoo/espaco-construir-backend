@@ -92,9 +92,17 @@ public class ProfessorController {
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
         try {
-            Long authenticatedUserId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                    .getId();
-            User professor = userService.findById(authenticatedUserId);
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email;
+            if (principal instanceof org.springframework.security.core.userdetails.User userDetails) {
+                email = userDetails.getUsername();
+            } else if (principal instanceof String str) {
+                email = str;
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+            }
+            User professor = userService.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("Professor not found."));
             TeacherResponseDTO response = new TeacherResponseDTO(
                     professor.getId(),
                     professor.getName(),
