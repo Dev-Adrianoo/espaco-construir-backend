@@ -64,7 +64,7 @@ Este projeto é o backend de um sistema de tutoria, desenvolvido em Java com Spr
 
 O projeto usa PostgreSQL com as seguintes tabelas:
 
-- `users`: Usuários do sistema (responsáveis e professores)
+- `users`: Usuários do sistema (responsáveis, professores e alunos)
 
   - Campos: id, name, email, password, phone, cnpj, role, created_at, updated_at
 
@@ -131,10 +131,20 @@ src/main/resources/db/migration/
 ### Alunos
 
 - `GET /api/students`: Listar todos alunos
-- `POST /api/students`: Cadastrar novo aluno
+- `POST /api/students/register`: Cadastrar novo aluno
 - `GET /api/students/{id}`: Buscar aluno por ID
 - `PUT /api/students/{id}`: Atualizar aluno
 - `DELETE /api/students/{id}`: Deletar aluno
+
+#### Observação sobre cadastro de alunos
+
+- **E-mail e senha não são obrigatórios para alunos.**
+- Se não for informado um e-mail no cadastro, o backend irá gerar automaticamente um e-mail único para o aluno no formato:
+  ```
+  aluno<ID>@aluno.espacoconstruir.com.br
+  ```
+  Onde `<ID>` é o identificador único do aluno no sistema.
+- Esse e-mail é apenas para identificação interna e não deve ser usado para login.
 
 ### Agendamentos
 
@@ -170,6 +180,8 @@ src/main/resources/db/migration/
 - As respostas são em formato JSON
 - Consulte os logs do Spring Boot para debugging
 - Use o token JWT no header `Authorization: Bearer <token>`
+- **Ao cadastrar um aluno sem e-mail, o backend irá gerar automaticamente um e-mail único no formato `aluno<ID>@aluno.espacoconstruir.com.br`.**
+- Esse e-mail é apenas para uso interno e não serve para login.
 
 ---
 

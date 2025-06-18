@@ -25,11 +25,21 @@ public class StudentService {
         // 1. Criar usuário
         User user = new User();
         user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+
+        // Sempre gera um e-mail temporário único (timestamp)
+        String tempEmail = "temp" + System.currentTimeMillis() + "@aluno.espacoconstruir.com.br";
+        user.setEmail(dto.getEmail() != null && !dto.getEmail().isBlank() ? dto.getEmail() : tempEmail);
+        user.setPassword(dto.getPassword() != null ? dto.getPassword() : "");
         user.setPhone(dto.getPhone());
         user.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
         user = userService.register(user);
+
+        // Agora gera o e-mail definitivo com o ID
+        if (user.getEmail().startsWith("temp")) {
+            String generatedEmail = "aluno" + user.getId() + "@aluno.espacoconstruir.com.br";
+            user.setEmail(generatedEmail);
+            user = userService.update(user);
+        }
 
         // 2. Criar estudante
         Student student = new Student();

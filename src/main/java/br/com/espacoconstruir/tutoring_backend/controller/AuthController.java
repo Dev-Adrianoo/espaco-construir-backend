@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,6 +36,12 @@ public class AuthController {
             User user = userService.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+            if (!user.getRole().equals(request.getRole())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Tipo de usuário incorreto. Você está tentando acessar como " +
+                                request.getUserType() + " mas sua conta é do tipo " + user.getRole());
+            }
+
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 return ResponseEntity.badRequest().body("Senha incorreta");
             }
@@ -49,6 +56,8 @@ public class AuthController {
                     user.getRole());
 
             return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
