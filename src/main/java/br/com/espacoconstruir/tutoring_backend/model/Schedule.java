@@ -33,12 +33,18 @@ public class Schedule {
   @Column
   private String description;
 
+  @Column(nullable = true)
+  private String meetingLink;
+
+  @Column(nullable = true)
+  private String difficulties;
+
+  @Column(nullable = true)
+  private String condition;
+
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private ScheduleStatus status;
-
-  @Column
-  private String meetingLink;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)

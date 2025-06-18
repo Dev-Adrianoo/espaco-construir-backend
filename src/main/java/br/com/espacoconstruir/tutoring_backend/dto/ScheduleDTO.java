@@ -13,10 +13,34 @@ public class ScheduleDTO {
     private Long teacherId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String subject;
-    private String description;
-    private ScheduleStatus status;
+    private String difficulties;
+    private String condition;
     private String meetingLink;
+    private ScheduleStatus status;
     private ScheduleModality modality;
     private String studentName;
+
+    public String getDifficulties() {
+        return difficulties;
+    }
+
+    public void setDifficulties(String difficulties) {
+        this.difficulties = difficulties;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public String getMeetingLink() {
+        return meetingLink;
+    }
+
+    public void setMeetingLink(String meetingLink) {
+        this.meetingLink = meetingLink;
+    }
 }

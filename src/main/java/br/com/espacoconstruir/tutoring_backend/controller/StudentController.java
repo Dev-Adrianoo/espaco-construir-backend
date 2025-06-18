@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import br.com.espacoconstruir.tutoring_backend.dto.GuardianDTO;
+import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
 
 @RestController
 @RequestMapping("/api/students")
@@ -19,6 +22,9 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerStudent(@Valid @RequestBody StudentDTO dto) {
@@ -68,22 +74,35 @@ public class StudentController {
         try {
             List<User> students = studentService.findByTeacherId(teacherId);
             List<StudentResponseDTO> response = students.stream()
-                    .map(s -> new StudentResponseDTO(
-                            s.getId(),
-                            s.getName(),
-                            s.getEmail(),
-                            s.getPhone(),
-                            null, // age
-                            null, // grade
-                            null, // condition
-                            null, // difficulties
-                            s.getRole(),
-                            null, // guardianId
-                            null, // registeredBy
-                            null, // createdAt
-                            null, // updatedAt
-                            null // guardian
-                    ))
+                    .map(s -> {
+                        // Buscar dados completos do estudante
+                        Student student = studentRepository.findById(s.getId())
+                                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+                        // Buscar dados do responsável
+                        User guardian = student.getGuardian();
+                        GuardianDTO guardianDTO = new GuardianDTO(
+                                guardian.getId(),
+                                guardian.getName(),
+                                guardian.getEmail(),
+                                guardian.getPhone());
+
+                        return new StudentResponseDTO(
+                                s.getId(),
+                                s.getName(),
+                                s.getEmail(),
+                                s.getPhone(),
+                                student.getAge(),
+                                student.getGrade(),
+                                student.getCondition(),
+                                student.getDifficulties(),
+                                s.getRole(),
+                                guardian.getId(),
+                                null, // registeredBy - se necessário, implementar
+                                null, // createdAt - se necessário, implementar
+                                null, // updatedAt - se necessário, implementar
+                                guardianDTO);
+                    })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {

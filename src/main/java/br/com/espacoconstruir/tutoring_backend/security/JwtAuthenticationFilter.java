@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import br.com.espacoconstruir.tutoring_backend.service.JwtService;
 import java.io.IOException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -57,6 +59,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userDetails.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+          System.out.println("[JWT DEBUG] Usuário autenticado: " + authentication.getName());
+          System.out.println("[JWT DEBUG] Authorities: ");
+          for (GrantedAuthority authority : authentication.getAuthorities()) {
+            System.out.println("[JWT DEBUG] - " + authority.getAuthority());
+          }
+        }
       } else {
         System.out.println("JWT is NOT valid for user: " + userEmail);
       }

@@ -51,8 +51,8 @@ public class ScheduleService {
 
     // Find teacher (optional)
     User teacher = null;
-    if (bookingRequest.getTeacherId() != null && !bookingRequest.getTeacherId().isEmpty()) {
-      teacher = userRepository.findById(Long.parseLong(bookingRequest.getTeacherId()))
+    if (bookingRequest.getTeacherId() != null && !bookingRequest.getTeacherId().toString().isEmpty()) {
+      teacher = userRepository.findById(Long.parseLong(bookingRequest.getTeacherId().toString()))
           .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
     }
 
@@ -73,12 +73,12 @@ public class ScheduleService {
     schedule.setTeacher(teacher);
     schedule.setStartTime(startTime);
     schedule.setEndTime(endTime);
-    schedule.setSubject("Default Subject"); // TODO: Get subject from somewhere
-    schedule.setDescription("Booking for " + bookingRequest.getChildName());
+    schedule.setDifficulties(bookingRequest.getDifficulties());
+    schedule.setCondition(bookingRequest.getCondition());
     schedule.setStatus(ScheduleStatus.SCHEDULED);
     schedule.setModality(ScheduleModality.valueOf(bookingRequest.getModality().toUpperCase()));
-    // TODO: Generate or get meeting link
-    schedule.setMeetingLink("https://meet.google.com/xxx-yyyy-zzz");
+    // meetingLink é opcional
+    schedule.setMeetingLink(bookingRequest.getMeetingLink());
 
     Schedule savedSchedule = scheduleRepository.save(schedule);
     return convertToDTO(savedSchedule);
@@ -167,10 +167,10 @@ public class ScheduleService {
     dto.setTeacherId(schedule.getTeacher() != null ? schedule.getTeacher().getId() : null);
     dto.setStartTime(schedule.getStartTime());
     dto.setEndTime(schedule.getEndTime());
-    dto.setSubject(schedule.getSubject());
-    dto.setDescription(schedule.getDescription());
-    dto.setStatus(schedule.getStatus());
+    dto.setDifficulties(schedule.getDifficulties());
+    dto.setCondition(schedule.getCondition());
     dto.setMeetingLink(schedule.getMeetingLink());
+    dto.setStatus(schedule.getStatus());
     dto.setModality(schedule.getModality());
     return dto;
   }
