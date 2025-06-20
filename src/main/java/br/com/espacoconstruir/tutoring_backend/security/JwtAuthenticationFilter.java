@@ -38,6 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String userEmail;
 
     System.out.println("Entering JwtAuthenticationFilter for request: " + request.getRequestURI());
+    System.out.println("[DEBUG] Authorization header: " + authHeader + " | Endpoint: " + request.getRequestURI());
 
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       System.out.println("No JWT found or invalid format. Proceeding with filter chain.");
@@ -67,6 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           for (GrantedAuthority authority : authentication.getAuthorities()) {
             System.out.println("[JWT DEBUG] - " + authority.getAuthority());
           }
+          System.out.println("[DEBUG] Authorities no contexto: " + authentication.getAuthorities());
         }
       } else {
         System.out.println("JWT is NOT valid for user: " + userEmail);

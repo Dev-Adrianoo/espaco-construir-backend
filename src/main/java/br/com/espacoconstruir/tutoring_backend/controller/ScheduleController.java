@@ -23,7 +23,8 @@ public class ScheduleController {
     private ClassService classService;
 
     @PostMapping("/book")
-    public ResponseEntity<ScheduleDTO> bookClass(@RequestBody BookingRequestDTO bookingRequest) {
+    public ResponseEntity<List<ScheduleDTO>> bookClass(@RequestBody BookingRequestDTO bookingRequest) {
+        System.out.println("[DEBUG] Entrou no endpoint /api/schedules/book");
         return ResponseEntity.ok(scheduleService.createBooking(bookingRequest));
     }
 
@@ -63,5 +64,11 @@ public class ScheduleController {
     @GetMapping("/with-students")
     public ResponseEntity<List<ScheduleWithStudentsDTO>> getSchedulesWithStudents() {
         return ResponseEntity.ok(classService.getSchedulesWithStudents());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAllExceptions(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity.status(500).body("Erro interno: " + ex.getMessage());
     }
 }

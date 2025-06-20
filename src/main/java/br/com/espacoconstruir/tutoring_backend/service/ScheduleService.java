@@ -6,6 +6,7 @@ import br.com.espacoconstruir.tutoring_backend.exception.ResourceNotFoundExcepti
 import br.com.espacoconstruir.tutoring_backend.model.Schedule;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.repository.ScheduleRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
@@ -34,16 +35,11 @@ public class ScheduleService {
   private StudentRepository studentRepository;
 
   @Transactional
-  public ScheduleDTO createBooking(BookingRequestDTO bookingRequest) {
-    // Parse date and time
+  public List<ScheduleDTO> createBooking(BookingRequestDTO bookingRequest) {
     LocalDate date = LocalDate.parse(bookingRequest.getDate());
     LocalTime time = LocalTime.parse(bookingRequest.getTime());
     LocalDateTime startTime = LocalDateTime.of(date, time);
     LocalDateTime endTime = startTime.plusHours(1); // Assuming 1-hour classes
-
-    // Find student (child)
-    User student = userRepository.findById(Long.parseLong(bookingRequest.getChildId()))
-        .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
     // Find guardian
     User guardian = userRepository.findById(Long.parseLong(bookingRequest.getGuardianId()))
@@ -56,37 +52,29 @@ public class ScheduleService {
           .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
     }
 
-    // Check for scheduling conflicts
-    if (scheduleRepository.existsByStudentIdAndStartTimeBetween(
-        student.getId(), startTime, endTime)) {
-      throw new RuntimeException("Student already has a schedule in this time slot");
+    List<ScheduleDTO> result = new java.util.ArrayList<>();
+    for (Long studentId : bookingRequest.getStudentIds()) {
+      Student student = studentRepository.findById(studentId)
+          .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+      Schedule schedule = new Schedule();
+      schedule.setStudent(student);
+      schedule.setTeacher(teacher);
+      schedule.setStartTime(startTime);
+      schedule.setEndTime(endTime);
+      schedule.setDifficulties(bookingRequest.getDifficulties());
+      schedule.setCondition(bookingRequest.getCondition());
+      schedule.setStatus(ScheduleStatus.SCHEDULED);
+      schedule.setModality(ScheduleModality.valueOf(bookingRequest.getModality().toUpperCase()));
+      schedule.setMeetingLink(bookingRequest.getMeetingLink());
+      Schedule savedSchedule = scheduleRepository.save(schedule);
+      result.add(convertToDTO(savedSchedule));
     }
-
-    if (teacher != null && scheduleRepository.existsByTeacherIdAndStartTimeBetween(
-        teacher.getId(), startTime, endTime)) {
-      throw new RuntimeException("Teacher already has a schedule in this time slot");
-    }
-
-    // Create schedule
-    Schedule schedule = new Schedule();
-    schedule.setStudent(student);
-    schedule.setTeacher(teacher);
-    schedule.setStartTime(startTime);
-    schedule.setEndTime(endTime);
-    schedule.setDifficulties(bookingRequest.getDifficulties());
-    schedule.setCondition(bookingRequest.getCondition());
-    schedule.setStatus(ScheduleStatus.SCHEDULED);
-    schedule.setModality(ScheduleModality.valueOf(bookingRequest.getModality().toUpperCase()));
-    // meetingLink é opcional
-    schedule.setMeetingLink(bookingRequest.getMeetingLink());
-
-    Schedule savedSchedule = scheduleRepository.save(schedule);
-    return convertToDTO(savedSchedule);
+    return result;
   }
 
   @Transactional
   public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
-    User student = userRepository.findById(scheduleDTO.getStudentId())
+    Student student = studentRepository.findById(scheduleDTO.getStudentId())
         .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
     User teacher = userRepository.findById(scheduleDTO.getTeacherId())
         .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
@@ -110,7 +98,6 @@ public class ScheduleService {
     schedule.setDescription(scheduleDTO.getDescription());
     schedule.setStatus(ScheduleStatus.SCHEDULED);
     schedule.setMeetingLink(scheduleDTO.getMeetingLink());
-
     Schedule savedSchedule = scheduleRepository.save(schedule);
     return convertToDTO(savedSchedule);
   }
@@ -129,7 +116,7 @@ public class ScheduleService {
         .collect(Collectors.toList());
   }
 
-  public List<User> getStudentsByTeacherId(Long teacherId) {
+  public List<Student> getStudentsByTeacherId(Long teacherId) {
     return scheduleRepository.findByTeacherId(teacherId).stream()
         .map(Schedule::getStudent)
         .distinct()
@@ -160,10 +147,7 @@ public class ScheduleService {
     ScheduleDTO dto = new ScheduleDTO();
     dto.setId(schedule.getId());
     dto.setStudentId(schedule.getStudent().getId());
-    studentRepository.findById(schedule.getStudent().getId())
-        .ifPresentOrElse(
-            student -> dto.setStudentName(student.getName()),
-            () -> dto.setStudentName("(Aluno não encontrado)"));
+    dto.setStudentName(schedule.getStudent().getName());
     dto.setTeacherId(schedule.getTeacher() != null ? schedule.getTeacher().getId() : null);
     dto.setStartTime(schedule.getStartTime());
     dto.setEndTime(schedule.getEndTime());
@@ -172,6 +156,8 @@ public class ScheduleService {
     dto.setMeetingLink(schedule.getMeetingLink());
     dto.setStatus(schedule.getStatus());
     dto.setModality(schedule.getModality());
+    dto.setSubject(schedule.getSubject());
+    dto.setDescription(schedule.getDescription());
     return dto;
   }
 }

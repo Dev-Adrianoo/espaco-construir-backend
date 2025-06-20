@@ -47,24 +47,32 @@ public class StudentController {
 
     @GetMapping
     public ResponseEntity<List<StudentResponseDTO>> listAllStudents() {
-        List<User> students = studentService.findAll();
+        List<Student> students = studentRepository.findAll();
         List<StudentResponseDTO> response = students.stream()
-                .map(s -> new StudentResponseDTO(
-                        s.getId(),
-                        s.getName(),
-                        s.getEmail(),
-                        s.getPhone(),
-                        null, // age
-                        null, // grade
-                        null, // condition
-                        null, // difficulties
-                        s.getRole(),
-                        null, // guardianId
-                        null, // registeredBy
-                        null, // createdAt
-                        null, // updatedAt
-                        null // guardian
-                ))
+                .map(student -> {
+                    User user = student.getUser();
+                    User guardian = student.getGuardian();
+                    GuardianDTO guardianDTO = guardian != null ? new GuardianDTO(
+                            guardian.getId(),
+                            guardian.getName(),
+                            guardian.getEmail(),
+                            guardian.getPhone()) : null;
+                    return new StudentResponseDTO(
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getPhone(),
+                            student.getAge(),
+                            student.getGrade(),
+                            student.getCondition(),
+                            student.getDifficulties(),
+                            user.getRole(),
+                            guardian != null ? guardian.getId() : null,
+                            null, // registeredBy
+                            null, // createdAt
+                            null, // updatedAt
+                            guardianDTO);
+                })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
@@ -72,35 +80,30 @@ public class StudentController {
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<List<StudentResponseDTO>> getStudentsByTeacherId(@PathVariable Long teacherId) {
         try {
-            List<User> students = studentService.findByTeacherId(teacherId);
+            List<Student> students = studentService.findByTeacherId(teacherId);
             List<StudentResponseDTO> response = students.stream()
-                    .map(s -> {
-                        // Buscar dados completos do estudante
-                        Student student = studentRepository.findById(s.getId())
-                                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-                        // Buscar dados do responsável
+                    .map(student -> {
+                        User user = student.getUser();
                         User guardian = student.getGuardian();
-                        GuardianDTO guardianDTO = new GuardianDTO(
+                        GuardianDTO guardianDTO = guardian != null ? new GuardianDTO(
                                 guardian.getId(),
                                 guardian.getName(),
                                 guardian.getEmail(),
-                                guardian.getPhone());
-
+                                guardian.getPhone()) : null;
                         return new StudentResponseDTO(
-                                s.getId(),
-                                s.getName(),
-                                s.getEmail(),
-                                s.getPhone(),
+                                user.getId(),
+                                user.getName(),
+                                user.getEmail(),
+                                user.getPhone(),
                                 student.getAge(),
                                 student.getGrade(),
                                 student.getCondition(),
                                 student.getDifficulties(),
-                                s.getRole(),
-                                guardian.getId(),
-                                null, // registeredBy - se necessário, implementar
-                                null, // createdAt - se necessário, implementar
-                                null, // updatedAt - se necessário, implementar
+                                user.getRole(),
+                                guardian != null ? guardian.getId() : null,
+                                null, // registeredBy
+                                null, // createdAt
+                                null, // updatedAt
                                 guardianDTO);
                     })
                     .collect(Collectors.toList());

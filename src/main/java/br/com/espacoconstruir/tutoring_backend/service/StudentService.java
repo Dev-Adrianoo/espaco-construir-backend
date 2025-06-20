@@ -55,6 +55,7 @@ public class StudentService {
             throw new RuntimeException("Usuário não é um responsável");
         }
         student.setGuardian(guardian);
+        student.setUser(user);
 
         studentRepository.save(student);
 
@@ -69,11 +70,11 @@ public class StudentService {
         return userService.findById(id);
     }
 
-    public List<User> findAll() {
-        return userService.findAllByRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
+    public List<Student> findAll() {
+        return studentRepository.findAll();
     }
 
-    public List<User> findByTeacherId(Long teacherId) {
+    public List<Student> findByTeacherId(Long teacherId) {
         return scheduleService.getStudentsByTeacherId(teacherId);
     }
 

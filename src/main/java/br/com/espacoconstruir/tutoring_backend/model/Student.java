@@ -1,6 +1,5 @@
 package br.com.espacoconstruir.tutoring_backend.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +26,11 @@ public class Student {
     @JoinColumn(name = "guardian_id", nullable = false)
     private User guardian;
 
-    //Future support for online classes
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    // Future support for online classes
     // @Enumerated(EnumType.STRING)
     // private Modality modality;
 }

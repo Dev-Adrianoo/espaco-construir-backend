@@ -15,7 +15,7 @@ public class Schedule {
 
   @ManyToOne
   @JoinColumn(name = "student_id", nullable = false)
-  private User student;
+  private Student student;
 
   @ManyToOne
   @JoinColumn(name = "teacher_id", nullable = true)
