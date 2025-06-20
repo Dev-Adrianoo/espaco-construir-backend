@@ -2,7 +2,9 @@ package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.BookingRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.ScheduleDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.ScheduleWithStudentsDTO;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
+import br.com.espacoconstruir.tutoring_backend.service.ClassService;
 import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ public class ScheduleController {
 
     @Autowired
     private ScheduleService scheduleService;
+
+    @Autowired
+    private ClassService classService;
 
     @PostMapping("/book")
     public ResponseEntity<ScheduleDTO> bookClass(@RequestBody BookingRequestDTO bookingRequest) {
@@ -53,5 +58,10 @@ public class ScheduleController {
     @GetMapping
     public ResponseEntity<List<ScheduleDTO>> getAllSchedules() {
         return ResponseEntity.ok(scheduleService.getAllSchedules());
+    }
+
+    @GetMapping("/with-students")
+    public ResponseEntity<List<ScheduleWithStudentsDTO>> getSchedulesWithStudents() {
+        return ResponseEntity.ok(classService.getSchedulesWithStudents());
     }
 }

@@ -1,0 +1,64 @@
+# Funcionalidades: Editar e Excluir Filho/Aluno
+
+## 1. Editar Filho/Aluno
+
+**Endpoint:**
+PUT /api/students/{id}
+
+**Body (JSON):**
+```
+{
+  "name": "Novo Nome",
+  "age": 12,
+  "grade": "6º ano",
+  "difficulties": "Nova dificuldade",
+  "condition": "Nova condição"
+}
+```
+
+**Orientação para o front-end:**
+- Ao clicar em "Editar", abra o formulário preenchido com os dados atuais do aluno.
+- Permita alterar nome, idade, série, dificuldade e condição.
+- Ao salvar, envie um PUT para o endpoint acima.
+- Após sucesso, atualize a lista de filhos/alunos na tela.
+
+---
+
+## 2. Excluir Filho/Aluno
+
+**Endpoint:**
+DELETE /api/students/{id}
+
+**Orientação para o front-end:**
+- Ao clicar em "Excluir", peça confirmação do usuário (opcional).
+- Envie um DELETE para o endpoint acima.
+- Após sucesso, remova o aluno da lista na tela.
+
+---
+
+## Exemplo de uso no front-end (pseudo-código):
+
+### Editar
+```js
+fetch(`/api/students/${id}`, {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name, age, grade, difficulties, condition })
+})
+  .then(res => res.json())
+  .then(() => atualizarListaDeFilhos());
+```
+
+### Excluir
+```js
+fetch(`/api/students/${id}`, { method: 'DELETE' })
+  .then(() => atualizarListaDeFilhos());
+```
+
+---
+
+**Observação:**
+- A exclusão remove apenas o aluno selecionado.
+- A edição permite alterar todos os campos principais do aluno.
+
+Dúvidas ou ajustes, só avisar! 

@@ -1,0 +1,63 @@
+# Endpoint: Listar Horários com Alunos Agendados
+
+**Endpoint:**
+GET /api/schedules/with-students
+
+**Descrição:**
+Retorna todos os horários (data + hora) com a lista de alunos agendados para cada horário. Cada horário pode ter até 10 alunos.
+
+**Formato da resposta:**
+```json
+[
+  {
+    "dia": "2025-06-23",
+    "hora": "09:00",
+    "alunos": ["Pietro", "Maria", "João", ...]
+  },
+  ...
+]
+```
+
+- `dia`: Data do agendamento (formato string, ex: "2025-06-23")
+- `hora`: Hora do agendamento (formato string, ex: "09:00")
+- `alunos`: Lista de nomes dos alunos agendados para aquele horário
+
+---
+
+## Orientação para o Front-end
+
+1. **Exibição dos alunos em cada horário:**
+   - Mostre os nomes dos alunos agendados no quadrado do horário.
+   - Se houver mais de 3 alunos, exiba apenas os 3 primeiros nomes seguidos de "..." ou um ícone de 3 pontinhos.
+   - Exemplo: `Pietro, Maria, João, ...`
+
+2. **Modal com lista completa:**
+   - Ao clicar nos 3 pontinhos, abra um modal exibindo a lista completa de alunos agendados para aquele horário.
+   - O modal deve mostrar todos os nomes presentes no array `alunos` daquele horário.
+
+3. **Limite de alunos:**
+   - O backend garante que no máximo 10 alunos podem ser agendados para o mesmo horário.
+   - Se o array `alunos` tiver 10 nomes, significa que o horário está cheio.
+
+4. **Sugestão de layout:**
+   - No quadrado do horário, exiba os nomes em linha, separados por vírgula.
+   - Se houver mais de 3 nomes, mostre os 3 primeiros e os 3 pontinhos.
+   - O modal pode ser um simples popup centralizado com a lista de nomes.
+
+---
+
+**Exemplo de uso no front-end (pseudo-código):**
+
+```js
+fetch('/api/schedules/with-students')
+  .then(res => res.json())
+  .then(data => {
+    // Para cada horário, renderize os nomes
+    // Se alunos.length > 3, mostre os 3 primeiros + '...'
+    // Ao clicar em '...', abra modal com data.alunos
+  });
+```
+
+---
+
+Dúvidas ou ajustes, só avisar! 
