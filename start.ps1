@@ -10,7 +10,7 @@ Write-Host ""
 
 Write-Host ""
 Write-Host "Iniciando servicos Docker com Docker Compose..." -ForegroundColor Cyan
-docker-compose up -d --build > $null 2>&1
+docker compose up -d --build > $null 2>&1
 
 Write-Host ""
 Write-Host "Aguardando o banco de dados estar pronto..."
