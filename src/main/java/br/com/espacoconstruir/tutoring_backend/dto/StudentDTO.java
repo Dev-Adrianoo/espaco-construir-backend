@@ -1,21 +1,11 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 public class StudentDTO {
   @NotBlank(message = "Nome é obrigatório")
   private String name;
-
-  @Email(message = "Email inválido")
-  private String email;
-
-  private String password;
-
-  @Pattern(regexp = "^\\d{10,11}$", message = "Telefone deve ter 10 ou 11 dígitos")
-  private String phone;
 
   @NotNull(message = "ID do responsável é obrigatório")
   private Long guardianId;
@@ -44,30 +34,6 @@ public class StudentDTO {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getPhone() {
-    return phone;
-  }
-
-  public void setPhone(String phone) {
-    this.phone = phone;
   }
 
   public Long getGuardianId() {
