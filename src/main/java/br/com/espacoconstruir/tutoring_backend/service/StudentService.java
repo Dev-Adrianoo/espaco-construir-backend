@@ -37,7 +37,7 @@ public class StudentService {
         student.setDifficulties(dto.getDifficulties());
         student.setGuardian(guardian);
 
-        // Criar usuário vinculado ao aluno (sem email/phone próprios)
+        
         User user = new User();
         user.setName(dto.getName());
         user.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
@@ -76,11 +76,11 @@ public class StudentService {
     }
 
     public User update(Long id, StudentDTO dto) {
+        // Get the user and update basic info
         User user = userService.findById(id);
         user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
 
+        // Get and update student info
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
 
@@ -90,6 +90,7 @@ public class StudentService {
         student.setCondition(dto.getCondition());
         student.setDifficulties(dto.getDifficulties());
 
+        // Save both entities
         studentRepository.save(student);
         return userService.update(user);
     }

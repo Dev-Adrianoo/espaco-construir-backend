@@ -57,6 +57,7 @@ public class SecurityConfig {
             .requestMatchers("/api/guardians/children").permitAll()
             .requestMatchers("/api/students/register").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             .requestMatchers("/api/schedules/book").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers("/api/schedules/{scheduleId}/status").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             .requestMatchers("/api/students/teacher/**").hasAuthority("PROFESSORA")
             .anyRequest().authenticated())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
