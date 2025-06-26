@@ -3,7 +3,6 @@ package br.com.espacoconstruir.tutoring_backend.model;
 import java.util.List;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,8 @@ import java.util.ArrayList;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -43,20 +43,22 @@ public class User {
 
     // Campos específicos do aluno
     @Transient
-    @Getter
-    @Setter
     private Integer age;
     @Transient
-    @Getter
-    @Setter
     private String grade;
     @Transient
-    @Getter
-    @Setter
     private String condition;
     @Transient
-    @Getter
-    @Setter
     private String difficulties;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", role=" + role +
+                '}';
+    }
 }

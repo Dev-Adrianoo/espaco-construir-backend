@@ -2,12 +2,14 @@ package br.com.espacoconstruir.tutoring_backend.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "students")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Student {
@@ -33,4 +35,18 @@ public class Student {
     // Future support for online classes
     // @Enumerated(EnumType.STRING)
     // private Modality modality;
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", grade='" + grade + '\'' +
+                ", condition='" + condition + '\'' +
+                ", difficulties='" + difficulties + '\'' +
+                ", guardianId=" + (guardian != null ? guardian.getId() : null) +
+                ", userId=" + (user != null ? user.getId() : null) +
+                '}';
+    }
 }

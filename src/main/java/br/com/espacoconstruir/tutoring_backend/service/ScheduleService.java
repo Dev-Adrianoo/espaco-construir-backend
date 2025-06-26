@@ -128,43 +128,46 @@ public class ScheduleService {
   @Transactional
   public ScheduleDTO updateScheduleStatus(Long scheduleId, ScheduleStatus newStatus) {
     System.out.println("Tentando encontrar agendamento com ID: " + scheduleId);
-    
+
     // Listar todos os agendamentos para debug
     List<Schedule> allSchedules = scheduleRepository.findAll();
     System.out.println("Total de agendamentos existentes: " + allSchedules.size());
     System.out.println("Agendamentos existentes:");
     for (Schedule s : allSchedules) {
       System.out.println(String.format(
-        "ID: %d, Aluno: %s (ID: %d), Professor: %s, Status: %s, Data/Hora: %s",
-        s.getId(),
-        s.getStudent().getName(),
-        s.getStudent().getId(),
-        s.getTeacher() != null ? s.getTeacher().getName() : "Não definido",
-        s.getStatus(),
-        s.getStartTime()
-      ));
+          "ID: %d, Aluno: %s (ID: %d), Professor: %s, Status: %s, Data/Hora: %s",
+          s.getId(),
+          s.getStudent().getName(),
+          s.getStudent().getId(),
+          s.getTeacher() != null ? s.getTeacher().getName() : "Não definido",
+          s.getStatus(),
+          s.getStartTime()));
     }
-    
+
     Schedule schedule = scheduleRepository.findById(scheduleId)
         .orElseThrow(() -> new ResourceNotFoundException("Schedule not found"));
-    
+
     // Verificar se o aluno pertence ao responsável antes de permitir o cancelamento
     var auth = SecurityContextHolder.getContext().getAuthentication();
     System.out.println("Auth: " + auth);
     System.out.println("Principal: " + auth.getPrincipal());
     System.out.println("Authorities: " + auth.getAuthorities());
-    
-    User currentUser = (User) auth.getPrincipal();
+
+    String userEmail = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
+    User currentUser = userRepository.findByEmail(userEmail)
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
     System.out.println("Current user: " + currentUser);
     System.out.println("Current user role: " + currentUser.getRole());
-    
+
     if (currentUser.getRole() == Role.RESPONSAVEL) {
       Student student = schedule.getStudent();
-      if (student == null || student.getGuardian() == null || !student.getGuardian().getId().equals(currentUser.getId())) {
+      if (student == null || student.getGuardian() == null
+          || !student.getGuardian().getId().equals(currentUser.getId())) {
         throw new RuntimeException("Você não tem permissão para cancelar este agendamento");
       }
     }
-    
+
     schedule.setStatus(newStatus);
     return convertToDTO(scheduleRepository.save(schedule));
   }
