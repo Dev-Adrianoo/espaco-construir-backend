@@ -37,13 +37,13 @@ public class StudentService {
         student.setDifficulties(dto.getDifficulties());
         student.setGuardian(guardian);
 
-        
         User user = new User();
         user.setName(dto.getName());
         user.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
         
-        // Usar email do responsável com sufixo do aluno
-        String studentEmail = "aluno." + guardian.getEmail();
+        // Gerar um email único para o aluno usando um timestamp
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String studentEmail = "aluno." + timestamp + "." + guardian.getEmail();
         user.setEmail(studentEmail);
         
         // Usar telefone do responsável
@@ -52,10 +52,13 @@ public class StudentService {
         // Senha vazia pois aluno não faz login
         user.setPassword("");
         
+        // Primeiro registra o usuário
         user = userService.register(user);
-        student.setUser(user);
 
+        // Depois cria o aluno com o usuário já registrado
+        student.setUser(user);
         studentRepository.save(student);
+        
         return user;
     }
 
@@ -96,7 +99,17 @@ public class StudentService {
     }
 
     public void delete(Long id) {
+        // Primeiro busca o aluno para pegar o ID do usuário correto
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
+        
+        // Pega o ID do usuário do aluno
+        Long userId = student.getUser().getId();
+        
+        // Primeiro deleta o aluno
         studentRepository.deleteById(id);
-        userService.delete(id);
+        
+        // Depois deleta o usuário do aluno usando o ID correto
+        userService.delete(userId);
     }
 }

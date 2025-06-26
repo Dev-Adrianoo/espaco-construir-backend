@@ -20,20 +20,28 @@ public class ClassHistoryService {
   private UserRepository userRepository;
   @Autowired
   private ClassRepository classRepository;
+  @Autowired
+  private StudentService studentService;
 
   public ClassHistoryDTO save(ClassHistoryDTO dto) {
     ClassHistory history = new ClassHistory();
-    User student = userRepository.findById(dto.getStudentId())
-        .orElseThrow(() -> new RuntimeException("Student not found"));
+    
+    // Busca o aluno pelo ID
+    User student = studentService.findById(dto.getStudentId());
+    
+    // Busca o professor pelo ID
     User teacher = userRepository.findById(dto.getTeacherId())
-        .orElseThrow(() -> new RuntimeException("Teacher not found"));
+        .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+    
     history.setStudent(student);
     history.setTeacher(teacher);
+    
     if (dto.getClassId() != null) {
       Class aClass = classRepository.findById(dto.getClassId())
           .orElse(null);
       history.setaClass(aClass);
     }
+    
     history.setComment(dto.getComment());
     ClassHistory saved = classHistoryRepository.save(history);
     return toDTO(saved);

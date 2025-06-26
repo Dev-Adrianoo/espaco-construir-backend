@@ -8,19 +8,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/history")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ClassHistoryController {
   @Autowired
   private ClassHistoryService classHistoryService;
 
-  @PostMapping
+  @PostMapping("/history")
   public ResponseEntity<ClassHistoryDTO> save(@RequestBody ClassHistoryDTO dto) {
     return ResponseEntity.ok(classHistoryService.save(dto));
   }
 
-  @GetMapping
-  public ResponseEntity<List<ClassHistoryDTO>> getByStudent(@RequestParam Long studentId) {
+  @GetMapping("/history")
+  public ResponseEntity<List<ClassHistoryDTO>> getByStudentParam(@RequestParam Long studentId) {
+    return ResponseEntity.ok(classHistoryService.findByStudentId(studentId));
+  }
+
+  @GetMapping("/students/{studentId}/history")
+  public ResponseEntity<List<ClassHistoryDTO>> getByStudentPath(@PathVariable Long studentId) {
     return ResponseEntity.ok(classHistoryService.findByStudentId(studentId));
   }
 }

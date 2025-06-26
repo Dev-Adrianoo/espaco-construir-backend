@@ -62,3 +62,63 @@ fetch(`/api/students/${id}`, { method: 'DELETE' })
 - A edição permite alterar todos os campos principais do aluno.
 
 Dúvidas ou ajustes, só avisar! 
+
+# Endpoints para Editar e Excluir Alunos (Filhos)
+
+## Editar Aluno
+PUT /api/students/{id}
+
+Onde {id} é o ID do aluno que deseja editar.
+
+### Payload (JSON)
+```json
+{
+  "name": "Nome do Aluno",
+  "age": 10,
+  "grade": "5º ano",
+  "condition": "Condição específica (opcional)",
+  "difficulties": "Dificuldades específicas (opcional)",
+  "guardianId": 123
+}
+```
+
+### Resposta de Sucesso
+- Status: 200 OK
+- Corpo: Retorna os dados do aluno atualizado
+
+### Resposta de Erro
+- Status: 400 Bad Request
+- Corpo: Mensagem de erro explicando o problema
+
+## Excluir Aluno
+DELETE /api/students/{id}
+
+Onde {id} é o ID do aluno que deseja excluir.
+
+### Payload
+Não é necessário enviar payload.
+
+### Resposta de Sucesso
+- Status: 204 No Content
+- Corpo: Vazio
+
+### Resposta de Erro
+- Status: 400 Bad Request
+- Corpo: Mensagem de erro explicando o problema
+
+## Observações Importantes
+1. Ao excluir um aluno:
+   - Apenas o aluno é excluído
+   - O responsável (guardian) NÃO é excluído
+   - O responsável mantém acesso ao sistema
+   - O responsável pode continuar gerenciando outros filhos
+   
+2. Campos obrigatórios para edição:
+   - name: Nome do aluno
+   - guardianId: ID do responsável
+
+3. Campos opcionais para edição:
+   - age: Idade do aluno
+   - grade: Série/Ano escolar
+   - condition: Condição específica
+   - difficulties: Dificuldades específicas 
