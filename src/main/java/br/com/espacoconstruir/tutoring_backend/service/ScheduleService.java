@@ -41,13 +41,11 @@ public class ScheduleService {
     LocalDate date = LocalDate.parse(bookingRequest.getDate());
     LocalTime time = LocalTime.parse(bookingRequest.getTime());
     LocalDateTime startTime = LocalDateTime.of(date, time);
-    LocalDateTime endTime = startTime.plusHours(1); // Assuming 1-hour classes
+    LocalDateTime endTime = startTime.plusHours(1); // Assumindo que seja 1 hora de duração.
 
-    // Find guardian
     User guardian = userRepository.findById(Long.parseLong(bookingRequest.getGuardianId()))
         .orElseThrow(() -> new ResourceNotFoundException("Guardian not found"));
 
-    // Find teacher (optional)
     User teacher = null;
     if (bookingRequest.getTeacherId() != null && !bookingRequest.getTeacherId().toString().isEmpty()) {
       teacher = userRepository.findById(Long.parseLong(bookingRequest.getTeacherId().toString()))

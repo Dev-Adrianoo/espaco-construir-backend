@@ -38,7 +38,7 @@ public class StudentController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getStudent(@PathVariable Long id) {
         try {
-            User student = studentService.findById(id);
+            Student student = studentService.findById(id);
             return ResponseEntity.ok(student);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

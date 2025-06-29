@@ -35,3 +35,7 @@ jwt:
 
 cors:
   allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}
+
+n8n:
+  webhook:
+    url: ${N8N_WEBHOOK_URL:http://localhost:5678/webhook-test/ad746243-b5fb-49ad-9c91-a4ec988dae52}

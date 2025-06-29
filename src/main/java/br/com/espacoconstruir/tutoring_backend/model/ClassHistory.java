@@ -12,7 +12,7 @@ public class ClassHistory {
 
   @ManyToOne
   @JoinColumn(name = "student_id", nullable = false)
-  private User student;
+  private Student student;
 
   @ManyToOne
   @JoinColumn(name = "teacher_id", nullable = false)
@@ -36,12 +36,12 @@ public class ClassHistory {
     this.id = id;
   }
 
-  public User getStudent() {
+  public Student getStudent() {
     return student;
   }
 
-  public void setStudent(User student) {
-    this.student = student;
+  public void setStudent(Student student2) {
+    this.student = student2;
   }
 
   public User getTeacher() {

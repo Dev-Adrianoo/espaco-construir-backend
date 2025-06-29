@@ -43,5 +43,14 @@ services:
       - postgres
     restart: unless-stopped
 
+  evolution_api:
+    image: atendai/evolution-api:latest
+    container_name: evolution_api
+    environment:
+      AUTHENTICATION_API_KEY: mude-me   
+    ports:
+      - "8081:8080" 
+    restart: unless-stopped
+
 volumes:
   postgres_data:

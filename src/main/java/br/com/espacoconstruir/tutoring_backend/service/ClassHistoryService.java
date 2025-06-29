@@ -2,6 +2,7 @@ package br.com.espacoconstruir.tutoring_backend.service;
 
 import br.com.espacoconstruir.tutoring_backend.dto.ClassHistoryDTO;
 import br.com.espacoconstruir.tutoring_backend.model.ClassHistory;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.model.Class;
 import br.com.espacoconstruir.tutoring_backend.repository.ClassHistoryRepository;
@@ -27,7 +28,7 @@ public class ClassHistoryService {
     ClassHistory history = new ClassHistory();
     
     // Busca o aluno pelo ID
-    User student = studentService.findById(dto.getStudentId());
+    Student student = studentService.findById(dto.getStudentId());
     
     // Busca o professor pelo ID
     User teacher = userRepository.findById(dto.getTeacherId())

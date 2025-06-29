@@ -66,8 +66,9 @@ public class StudentService {
         return studentRepository.findByGuardian(guardian);
     }
 
-    public User findById(Long id) {
-        return userService.findById(id);
+    public Student findById(Long id) {
+        return studentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Estudante com ID" + id + "não encontrado"));
     }
 
     public List<Student> findAll() {
@@ -83,7 +84,7 @@ public class StudentService {
         User user = userService.findById(id);
         user.setName(dto.getName());
 
-        // Get and update student info
+        
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
 
@@ -93,7 +94,7 @@ public class StudentService {
         student.setCondition(dto.getCondition());
         student.setDifficulties(dto.getDifficulties());
 
-        // Save both entities
+
         studentRepository.save(student);
         return userService.update(user);
     }
