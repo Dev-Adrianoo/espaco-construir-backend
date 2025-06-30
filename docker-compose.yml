@@ -1,56 +1,44 @@
-version: "3.8"
-
 services:
-  postgres:
+  tutoring_db:
     image: postgres:15
     container_name: tutoring_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: tutoring_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+ 
+    networks:
+      - espacoconstruir_net
 
   backend:
     build: .
     container_name: espaco_construir_backend
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/tutoring_db
+      DB_URL: jdbc:postgresql://tutoring_db:5432/tutoring_db
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      DB_DRIVER: org.postgresql.Driver
-      JPA_DDL_AUTO: validate
-      JPA_SHOW_SQL: "true"
-      JPA_FORMAT_SQL: "true"
-      FLYWAY_ENABLED: "true"
-      FLYWAY_BASELINE_ON_MIGRATE: "true"
-      FLYWAY_BASELINE_VERSION: 1
-      FLYWAY_LOCATIONS: classpath:db/migration
-      FLYWAY_VALIDATE_ON_MIGRATE: "false"
-      FLYWAY_CLEAN_DISABLED: "false"
-      FLYWAY_CLEAN_ON_VALIDATION_ERROR: "false"
-      FLYWAY_OUT_OF_ORDER: "true"
-      SERVER_PORT: 8080
+      SERVER_PORT: 8081
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       JWT_EXPIRATION: 86400000
       ALLOWED_ORIGINS: http://localhost:5173
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
-      - postgres
+      - tutoring_db
     restart: unless-stopped
+   
+    networks:
+      - espacoconstruir_net
 
-  evolution_api:
-    image: atendai/evolution-api:latest
-    container_name: evolution_api
-    environment:
-      AUTHENTICATION_API_KEY: mude-me   
-    ports:
-      - "8081:8080" 
-    restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  espacoconstruir_net:
+    external: true

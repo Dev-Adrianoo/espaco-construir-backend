@@ -95,7 +95,7 @@ O projeto suporta configuração via variáveis de ambiente:
 | `JPA_SHOW_SQL`    | `true`                                                             | Mostrar SQL no console    |
 | `JPA_FORMAT_SQL`  | `true`                                                             | Formatar SQL no console   |
 | `FLYWAY_ENABLED`  | `true`                                                             | Habilitar Flyway          |
-| `SERVER_PORT`     | `8080`                                                             | Porta da aplicação        |
+| `SERVER_PORT`     | `8081`                                                             | Porta da aplicação        |
 | `JWT_SECRET`      | `404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970` | Chave secreta JWT         |
 | `JWT_EXPIRATION`  | `86400000`                                                         | Expiração do token (24h)  |
 | `ALLOWED_ORIGINS` | `http://localhost:5173`                                            | CORS - origens permitidas |
@@ -257,7 +257,7 @@ src/main/resources/db/migration/
 ### Portas
 
 - **Frontend:** `http://localhost:5173`
-- **Backend:** `http://localhost:8080`
+- **Backend:** `http://localhost:8081`
 - **PostgreSQL:** `localhost:5432`
 
 ### Variáveis de Ambiente para Desenvolvimento

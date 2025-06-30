@@ -86,7 +86,7 @@ docker-compose up -d
 
 1. **No Notebook:** Clone o repositório do GitHub
 2. **Execute:** `docker-compose up -d`
-3. **Teste:** Acesse `http://localhost:8080`
+3. **Teste:** Acesse `http://localhost:8081`
 4. **Pronto:** Sistema funcionando igual ao desktop!
 
 ---

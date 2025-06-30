@@ -96,7 +96,7 @@ spring:
     baseline-on-migrate: true
 
 server:
-  port: 8080
+  port: 8081
 
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
@@ -108,7 +108,7 @@ cors:
 
 ### Portas Utilizadas
 
-- **Backend:** 8080
+- **Backend:** 8081
 - **PostgreSQL:** 5432
 - **Frontend:** 5173
 
@@ -177,15 +177,15 @@ docker-compose down
 
 ### Problemas Comuns
 
-1. **Porta 8080 em uso:**
+1. **Porta 8081 em uso:**
 
    ```bash
    # Windows
-   netstat -ano | findstr :8080
+   netstat -ano | findstr :8081
    taskkill /PID <PID> /F
 
    # Linux/Mac
-   lsof -i :8080
+   lsof -i :8081
    kill -9 <PID>
    ```
 

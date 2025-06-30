@@ -48,4 +48,4 @@ Write-Host ""
 Write-Host "Backend e banco estão rodando via Docker Compose!" -ForegroundColor Cyan
 Write-Host $line -ForegroundColor DarkCyan
 Write-Host ""
-Write-Host "Acesse o backend em http://localhost:8080" -ForegroundColor Green
+Write-Host "Acesse o backend em http://localhost:8081" -ForegroundColor Green

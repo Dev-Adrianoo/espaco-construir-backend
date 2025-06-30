@@ -2,40 +2,26 @@ spring:
   application:
     name: ${APP_NAME:espaco-construir-backend}
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/tutoring_db}
+
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/tutoring_db}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
-    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:validate}
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: ${JPA_SHOW_SQL:true}
-    properties:
-      hibernate:
-        format_sql: ${JPA_FORMAT_SQL:true}
+
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
-    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
-    baseline-version: ${FLYWAY_BASELINE_VERSION:1}
-    locations: ${FLYWAY_LOCATIONS:classpath:db/migration}
-    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:false}
-    clean-disabled: ${FLYWAY_CLEAN_DISABLED:false}
-    clean-on-validation-error: ${FLYWAY_CLEAN_ON_VALIDATION_ERROR:false}
-    out-of-order: ${FLYWAY_OUT_OF_ORDER:true}
-    ignore-missing-migrations: true
-    ignore-future-migrations: true
 
 server:
-  port: ${SERVER_PORT:8080}
 
-jwt:
-  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-  expiration: ${JWT_EXPIRATION:86400000}
+  port: ${SERVER_PORT:8081}
 
 cors:
   allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}
 
+
 n8n:
   webhook:
-    url: ${N8N_WEBHOOK_URL:http://localhost:5678/webhook-test/ad746243-b5fb-49ad-9c91-a4ec988dae52}
+    url: ${N8N_WEBHOOK_URL:http://evolution_api:5678/webhook/ad746243-b5fb-49ad-9c91-a4ec988dae52}
