@@ -1,3 +1,5 @@
+# Arquivo: ~/Documents/espaco-construir-backend/docker-compose.yml (VERSÃO FINAL E CORRETA)
+
 services:
   tutoring_db:
     image: postgres:15
@@ -11,9 +13,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
- 
     networks:
-      - espacoconstruir_net
+      - default
 
   backend:
     build: .
@@ -26,19 +27,21 @@ services:
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       JWT_EXPIRATION: 86400000
       ALLOWED_ORIGINS: http://localhost:5173
+
     ports:
       - "8081:8081"
     depends_on:
       - tutoring_db
     restart: unless-stopped
-   
     networks:
-      - espacoconstruir_net
-
+      - default
+      - evolution-net
 
 volumes:
   postgres_data:
 
 networks:
-  espacoconstruir_net:
+  default:
+    driver: bridge
+  evolution-net:
     external: true
