@@ -11,7 +11,7 @@ import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.StudentService;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
 
-import org.springframework.http.MediaType; 
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -19,10 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.http.HttpHeaders; 
+import org.springframework.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
-
 
 import java.util.HashMap;
 
@@ -39,7 +38,7 @@ public class ScheduleController {
     @Autowired
     private UserService userService;
 
-     @Autowired
+    @Autowired
     private StudentService studentService;
 
     @Autowired
@@ -66,10 +65,10 @@ public class ScheduleController {
             System.out.println("[DEBUG] - buscando student com o ID: " + bookingRequest.getStudentIds());
             long studentId = bookingRequest.getStudentIds().get(0);
             Student studentEntity = studentService.findById(studentId);
-            
-            User studentUser  = studentEntity.getUser();
 
-            if (studentUser == null) {          
+            User studentUser = studentEntity.getUser();
+
+            if (studentUser == null) {
                 throw new RuntimeException("O Aluno com ID " + studentId + " não está associado a um usuário.");
 
             }
@@ -84,16 +83,30 @@ public class ScheduleController {
             n8nPayload.put("startDateTime", startDateTimeISO);
             n8nPayload.put("durationMinutes", durationMinutes);
 
+            System.out.println("[DEBUG] Preparando para enviar payload para n8n:");
+            System.out.println("[DEBUG] URL do webhook: " + n8nWebhookUrl);
+            System.out.println("[DEBUG] Payload: " + n8nPayload);
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, String>> request = new HttpEntity<> (n8nPayload, headers);
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(n8nPayload, headers);
 
-            restTemplate.postForEntity(n8nWebhookUrl, request, String.class);
-
-            System.out.println("[DEBUG] KRATOS CHEGOU EM SEGURANÇA");
-            }catch (Exception e){
-                System.err.println("[AVISO] agendamento salvo, mas a chamada para o weebhook do n8n falhou:" + e.getMessage());
+            try {
+                ResponseEntity<String> response = restTemplate.postForEntity(n8nWebhookUrl, request, String.class);
+                System.out.println("[DEBUG] Resposta do n8n - Status: " + response.getStatusCode());
+                System.out.println("[DEBUG] Resposta do n8n - Body: " + response.getBody());
+                System.out.println("[DEBUG] KRATOS CHEGOU EM SEGURANÇA");
+            } catch (Exception e) {
+                System.err.println("[ERRO] Detalhes completos do erro ao chamar webhook:");
+                System.err.println("[ERRO] Mensagem: " + e.getMessage());
+                e.printStackTrace();
+                System.err.println("[AVISO] agendamento salvo, mas a chamada para o webhook do n8n falhou");
             }
+
+        } catch (Exception e) {
+            System.err.println(
+                    "[AVISO] agendamento salvo, mas a chamada para o weebhook do n8n falhou:" + e.getMessage());
+        }
 
         return ResponseEntity.ok((createdSchedules));
     }

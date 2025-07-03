@@ -26,7 +26,7 @@ echo ""
 cd ..
 if [ ! -d "$EVO_PROJECT_DIR_NAME" ]; then
     git clone "https://github.com/EvolutionAPI/evolution-api.git" "$EVO_PROJECT_DIR_NAME"
-fi
+fi 
 cd "$EVO_PROJECT_DIR_NAME"
 docker compose down --remove-orphans > /dev/null 2>&1 || true
 echo "🚀 Iniciando containers da Evolution API e criando a rede 'evolution-net'..."

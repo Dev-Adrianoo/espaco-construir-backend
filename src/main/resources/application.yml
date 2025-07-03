@@ -1,50 +1,29 @@
-# Arquivo: ~/Documents/espaco-construir-backend/docker-compose.yml (VERSÃO FINALÍSSIMA)
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
-services:
-  tutoring_db:
-    image: postgres:15
-    container_name: tutoring_db
-    environment:
-      POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: tutoring_db
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
- 
-    networks:
-      - default
+server:
+  port: ${SERVER_PORT:8081}
 
-  backend:
-    build: .
-    container_name: espaco_construir_backend
-    environment:
-   
-      DB_URL: jdbc:postgresql://tutoring_db:5432/tutoring_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      SERVER_PORT: 8081
-      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      JWT_EXPIRATION: 86400000
-      ALLOWED_ORIGINS: http://localhost:5173
-    ports:
-      - "8081:8081"
-    depends_on:
-      - tutoring_db
-    restart: unless-stopped
-   
-    networks:
-      - default 
-      - evolution-net 
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
-volumes:
-  postgres_data:
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS}
 
-${N8N_WEBHOOK_URL}
-networks:
-  default:
-    driver: bridge
-  evolution-net:
-    external: true
+n8n:
+  webhook-url: ${N8N_WEBHOOK_URL}

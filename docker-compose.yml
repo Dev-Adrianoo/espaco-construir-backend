@@ -1,4 +1,4 @@
-# Arquivo: ~/Documents/espaco-construir-backend/docker-compose.yml (VERSÃO FINAL E CORRETA)
+version: '3.8'
 
 services:
   tutoring_db:
@@ -14,7 +14,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - default
+      - app-network
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: always
+    networks:
+      - app-network
 
   backend:
     build: .
@@ -27,21 +38,23 @@ services:
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       JWT_EXPIRATION: 86400000
       ALLOWED_ORIGINS: http://localhost:5173
-
+      N8N_WEBHOOK_URL: http://n8n:5678/webhook/Event
     ports:
       - "8081:8081"
     depends_on:
       - tutoring_db
+      - n8n
     restart: unless-stopped
     networks:
-      - default
+      - app-network
       - evolution-net
 
-volumes:
-  postgres_data:
-
 networks:
-  default:
+  app-network:
     driver: bridge
   evolution-net:
     external: true
+
+volumes:
+  postgres_data:
+  n8n_data:
