@@ -1,6 +1,8 @@
 package br.com.espacoconstruir.tutoring_backend.repository;
 
 import br.com.espacoconstruir.tutoring_backend.model.Schedule;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   List<Schedule> findByStudentId(Long studentId);
 
   List<Schedule> findByTeacherId(Long teacherId);
+  
+  List<Schedule> findByStudent(Student student);
 
   List<Schedule> findByStudentIdAndStartTimeBetween(Long studentId, LocalDateTime start, LocalDateTime end);
 

@@ -1,11 +1,15 @@
 package br.com.espacoconstruir.tutoring_backend.service;
 
 import br.com.espacoconstruir.tutoring_backend.dto.StudentDTO;
+import br.com.espacoconstruir.tutoring_backend.model.Schedule;
 import br.com.espacoconstruir.tutoring_backend.model.Student;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
+import br.com.espacoconstruir.tutoring_backend.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +21,9 @@ public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @Autowired
     private ScheduleService scheduleService;
@@ -99,18 +106,37 @@ public class StudentService {
         return userService.update(user);
     }
 
-    public void delete(Long id) {
-        // Primeiro busca o aluno para pegar o ID do usuário correto
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
+    @Transactional
+    public void delete(Long studentId) {
+  
+        Student studentEntity = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("com id " + studentId + " não encontrado"));
         
-        // Pega o ID do usuário do aluno
-        Long userId = student.getUser().getId();
+        List<Schedule> associatedSchedules = scheduleRepository.findByStudent(studentEntity);
         
-        // Primeiro deleta o aluno
-        studentRepository.deleteById(id);
+        for (Schedule schedule : associatedSchedules) {
+            
+            if (schedule.getStatus() != br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus.CANCELLED) {
+            throw new IllegalStateException(
+                "Não é possível excluir o aluno, pois ele possui agendamentos ativos ou concluídos. Status encontrado: " + schedule.getStatus()
+                );
+
+            }
+        }
+
+        long studentUserId = studentEntity.getUser().getId();
         
-        // Depois deleta o usuário do aluno usando o ID correto
-        userService.delete(userId);
+            if (!associatedSchedules.isEmpty()) {
+                scheduleRepository.deleteAll(associatedSchedules);
+                System.out.println("✅ Histórico de agendamentos do aluno " + studentId + " limpo.");
+
+            }
+
+            studentRepository.delete(studentEntity);
+            System.out.println("✅ Aluno " + studentId + " excluído com sucesso.");
+
+            userService.delete(studentUserId);
+            System.out.println("✅ Entidade User do aluno (ID: " + studentUserId + ") removida.");
+            System.out.println("✅ O Responsável associado NÃO foi alterado.");
     }
 }
