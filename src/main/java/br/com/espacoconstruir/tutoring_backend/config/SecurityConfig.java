@@ -2,6 +2,7 @@ package br.com.espacoconstruir.tutoring_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,26 +44,39 @@ public class SecurityConfig {
     return source;
   }
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            // 1. Rotas Públicas
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/guardians/register").permitAll()
-            .requestMatchers("/api/teachers/register").permitAll()
-            .requestMatchers("/api/guardians").permitAll()
-            .requestMatchers("/api/guardians/children/**").hasAuthority("RESPONSAVEL")
+
+            // 2. Regras Específicas de PROFESSORA
             .requestMatchers("/api/students/teacher/**").hasAuthority("PROFESSORA")
-            .requestMatchers("/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers("/api/schedules/book").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers("/api/schedules/{scheduleId}/status").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            
+            // 3. Regras Específicas de RESPONSAVEL
+            .requestMatchers("/api/guardians/children/**").hasAuthority("RESPONSAVEL")
+
+            // 4. Regras para /students (agora explícitas e corretas)
+            .requestMatchers(HttpMethod.POST, "/api/students/register").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.PUT, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.GET, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+
+            // 5. Outras regras compartilhadas
+            .requestMatchers("/api/schedules/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             .requestMatchers("/api/history/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .anyRequest().authenticated())
+            .requestMatchers("/api/teachers").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            
+            // 6. Qualquer outra rota precisa estar autenticada
+            .anyRequest().authenticated()
+        )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
+}
 }

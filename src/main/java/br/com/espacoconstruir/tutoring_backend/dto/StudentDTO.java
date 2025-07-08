@@ -2,6 +2,8 @@ package br.com.espacoconstruir.tutoring_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class StudentDTO {
   @NotBlank(message = "Nome é obrigatório")
@@ -10,10 +12,14 @@ public class StudentDTO {
   @NotNull(message = "ID do responsável é obrigatório")
   private Long guardianId;
 
-  private Integer age;
   private String grade;
   private String condition;
   private String difficulties;
+
+  
+  @NotNull(message = "Data de nascimento é obrigatória")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+  private LocalDate birthDate;
 
   public StudentDTO() {
   }
@@ -21,15 +27,23 @@ public class StudentDTO {
   public StudentDTO(String name, Integer age, String grade,
       String difficulties, String condition, Long guardianId) {
     this.name = name;
-    this.age = age;
     this.grade = grade;
     this.difficulties = difficulties;
     this.condition = condition;
     this.guardianId = guardianId;
+    this.birthDate = birthDate;
   }
 
   public String getName() {
     return name;
+  }
+
+  public LocalDate getBirthDate() {
+    return birthDate;
+  }
+
+  public void setBirthDate(LocalDate birthDate) {
+    this.birthDate = birthDate;
   }
 
   public void setName(String name) {
@@ -44,13 +58,6 @@ public class StudentDTO {
     this.guardianId = guardianId;
   }
 
-  public Integer getAge() {
-    return age;
-  }
-
-  public void setAge(Integer age) {
-    this.age = age;
-  }
 
   public String getGrade() {
     return grade;

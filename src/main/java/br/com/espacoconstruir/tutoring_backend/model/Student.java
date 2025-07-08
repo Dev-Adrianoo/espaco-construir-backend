@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "students")
@@ -23,6 +25,7 @@ public class Student {
     private String grade;
     private String difficulties;
     private String condition;
+    private LocalDate birthDate;
 
     @ManyToOne
     @JoinColumn(name = "guardian_id", nullable = false)
@@ -45,8 +48,20 @@ public class Student {
                 ", grade='" + grade + '\'' +
                 ", condition='" + condition + '\'' +
                 ", difficulties='" + difficulties + '\'' +
+                ", birthDate='" + birthDate + '\'' +
                 ", guardianId=" + (guardian != null ? guardian.getId() : null) +
                 ", userId=" + (user != null ? user.getId() : null) +
                 '}';
+    }
+
+    public void setBirthDate(String birthDate) {
+        if (birthDate != null && !birthDate.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            this.birthDate = LocalDate.parse(birthDate, formatter);
+        }
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

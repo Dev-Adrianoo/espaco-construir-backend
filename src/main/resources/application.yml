@@ -27,3 +27,7 @@ cors:
 
 n8n:
   webhook-url: ${N8N_WEBHOOK_URL}
+
+logging:
+  level:
+    org.springframework.security: DEBUG

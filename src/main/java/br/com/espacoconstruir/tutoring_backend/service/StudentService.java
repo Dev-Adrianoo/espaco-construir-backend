@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,11 +40,12 @@ public class StudentService {
         // Criar estudante
         Student student = new Student();
         student.setName(dto.getName());
-        student.setAge(dto.getAge());
+
         student.setGrade(dto.getGrade());
         student.setCondition(dto.getCondition());
         student.setDifficulties(dto.getDifficulties());
         student.setGuardian(guardian);
+        student.setBirthDate(dto.getBirthDate());
 
         User user = new User();
         user.setName(dto.getName());
@@ -56,13 +59,13 @@ public class StudentService {
         // Usar telefone do responsável
         user.setPhone(guardian.getPhone());
         
-        // Senha vazia pois aluno não faz login
+     
         user.setPassword("");
         
-        // Primeiro registra o usuário
+       
         user = userService.register(user);
 
-        // Depois cria o aluno com o usuário já registrado
+        
         student.setUser(user);
         studentRepository.save(student);
         
@@ -87,21 +90,26 @@ public class StudentService {
     }
 
     public User update(Long id, StudentDTO dto) {
-        // Get the user and update basic info
-        User user = userService.findById(id);
+
+    
+            Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Estudante não encontrado com id: " + id));
+
+        User user = student.getUser();
+
         user.setName(dto.getName());
 
-        
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudante não encontrado"));
-
         student.setName(dto.getName());
-        student.setAge(dto.getAge());
+  
         student.setGrade(dto.getGrade());
         student.setCondition(dto.getCondition());
         student.setDifficulties(dto.getDifficulties());
+        student.setBirthDate(dto.getBirthDate());
 
-
+        if (dto.getBirthDate() != null) {
+            student.setAge(Period.between(dto.getBirthDate(), LocalDate.now()).getYears());
+        }
+        
         studentRepository.save(student);
         return userService.update(user);
     }

@@ -1,7 +1,9 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import br.com.espacoconstruir.tutoring_backend.model.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class StudentResponseDTO {
   private Long id;
@@ -18,6 +20,9 @@ public class StudentResponseDTO {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private GuardianDTO guardian;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+  private LocalDate birthDate;
 
   // Constructor vazio
   public StudentResponseDTO() {
@@ -41,9 +46,17 @@ public class StudentResponseDTO {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.guardian = guardian;
+    this.birthDate = birthDate;
   }
 
-  // Getters e setters
+  public LocalDate getBirthDate() {
+    return birthDate;
+  }
+
+  public void setBirthDate(LocalDate birthDate) {
+    this.birthDate = birthDate;
+  }
+
   public Long getId() {
     return id;
   }
