@@ -31,7 +31,7 @@ public class StudentResponseDTO {
   // Constructor com todos os campos
   public StudentResponseDTO(Long id, String name, String email, String phone, Integer age,
       String grade, String condition, String difficulties, Role role, Long guardianId,
-      Long registeredBy, LocalDateTime createdAt, LocalDateTime updatedAt, GuardianDTO guardian) {
+      Long registeredBy, LocalDateTime createdAt, LocalDateTime updatedAt, GuardianDTO guardian, LocalDate birthDate) {
     this.id = id;
     this.name = name;
     this.email = email;

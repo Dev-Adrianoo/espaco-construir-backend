@@ -3,6 +3,7 @@ package br.com.espacoconstruir.tutoring_backend.controller;
 import br.com.espacoconstruir.tutoring_backend.dto.StudentDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.model.User;
+import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,9 @@ public class StudentController {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerStudent(@Valid @RequestBody StudentDTO dto) {
@@ -57,6 +61,7 @@ public class StudentController {
                             guardian.getName(),
                             guardian.getEmail(),
                             guardian.getPhone()) : null;
+
                     return new StudentResponseDTO(
                             user.getId(),
                             user.getName(),
@@ -71,7 +76,9 @@ public class StudentController {
                             null, // registeredBy
                             null, // createdAt
                             null, // updatedAt
-                            guardianDTO);
+                            guardianDTO,
+                            student.getBirthDate()
+                            );
                 })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
@@ -85,13 +92,20 @@ public class StudentController {
                     .map(student -> {
                         User user = student.getUser();
                         User guardian = student.getGuardian();
-                        GuardianDTO guardianDTO = guardian != null ? new GuardianDTO(
-                                guardian.getId(),
-                                guardian.getName(),
-                                guardian.getEmail(),
-                                guardian.getPhone()) : null;
+                        
+                        GuardianDTO guardianDTO = null;
+
+                        if (guardian != null) {
+                            guardianDTO = new GuardianDTO(
+                            guardian.getId(),
+                            guardian.getName(),
+                            guardian.getEmail(),
+                            guardian.getPhone()
+                            );
+                        }
+
                         return new StudentResponseDTO(
-                                user.getId(),
+                                student.getId(),
                                 user.getName(),
                                 user.getEmail(),
                                 user.getPhone(),
@@ -104,10 +118,14 @@ public class StudentController {
                                 null, // registeredBy
                                 null, // createdAt
                                 null, // updatedAt
-                                guardianDTO);
-                    })
+                                guardianDTO,
+                                student.getBirthDate()
+                        );
+       })
                     .collect(Collectors.toList());
+
             return ResponseEntity.ok(response);
+                    
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Collections.emptyList());
         }

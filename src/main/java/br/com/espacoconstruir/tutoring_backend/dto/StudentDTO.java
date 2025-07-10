@@ -15,6 +15,7 @@ public class StudentDTO {
   private String grade;
   private String condition;
   private String difficulties;
+  private Long teacherId;
 
   
   @NotNull(message = "Data de nascimento é obrigatória")
@@ -32,6 +33,14 @@ public class StudentDTO {
     this.condition = condition;
     this.guardianId = guardianId;
     this.birthDate = birthDate;
+  }
+
+  public Long getTeacherId() {
+    return teacherId;
+  }
+
+  public void setTeacherId(Long teacherId) {
+    this.teacherId = teacherId;
   }
 
   public String getName() {

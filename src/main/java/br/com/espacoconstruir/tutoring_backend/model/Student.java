@@ -28,13 +28,16 @@ public class Student {
     private LocalDate birthDate;
 
     @ManyToOne
-    @JoinColumn(name = "guardian_id", nullable = false)
+    @JoinColumn(name = "guardian_id", nullable = true)
     private User guardian;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "registered_by_user_id")
+    private User registredBy;
     // Future support for online classes
     // @Enumerated(EnumType.STRING)
     // private Modality modality;
