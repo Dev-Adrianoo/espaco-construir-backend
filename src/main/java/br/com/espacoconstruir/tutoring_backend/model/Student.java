@@ -36,9 +36,10 @@ public class Student {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "registered_by_user_id")
-    private User registredBy;
-    // Future support for online classes
+    @JoinColumn(name = "registered_by_user_id") 
+    private User registeredBy; 
+
+    // Futuro suporte para aula online
     // @Enumerated(EnumType.STRING)
     // private Modality modality;
 
@@ -55,16 +56,5 @@ public class Student {
                 ", guardianId=" + (guardian != null ? guardian.getId() : null) +
                 ", userId=" + (user != null ? user.getId() : null) +
                 '}';
-    }
-
-    public void setBirthDate(String birthDate) {
-        if (birthDate != null && !birthDate.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            this.birthDate = LocalDate.parse(birthDate, formatter);
-        }
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
     }
 }

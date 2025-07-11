@@ -5,6 +5,9 @@ import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.StudentService;
+import br.com.espacoconstruir.tutoring_backend.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +33,17 @@ public class StudentController {
     @Autowired
     private ScheduleService scheduleService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerStudent(@Valid @RequestBody StudentDTO dto) {
         try {
             return ResponseEntity.ok(studentService.register(dto));
+
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+
         }
     }
 
@@ -44,9 +52,24 @@ public class StudentController {
         try {
             Student student = studentService.findById(id);
             return ResponseEntity.ok(student);
+
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+
         }
+    }
+
+    @GetMapping("/registered-by/{userId}")
+    public ResponseEntity<List<StudentResponseDTO>> getStudentsRegisteredByMe(Authentication authentication) {
+        String userEmail = authentication.getName();
+        User loggedInUser = userService.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+
+        List<Student> students = studentService.findByStudentsRegisteredBy(loggedInUser.getId());
+
+        List<StudentResponseDTO> dtos = studentService.convertToDtoList(students);
+        return ResponseEntity.ok(dtos);
+
     }
 
     @GetMapping
@@ -77,8 +100,7 @@ public class StudentController {
                             null, // createdAt
                             null, // updatedAt
                             guardianDTO,
-                            student.getBirthDate()
-                            );
+                            student.getBirthDate());
                 })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
@@ -92,16 +114,15 @@ public class StudentController {
                     .map(student -> {
                         User user = student.getUser();
                         User guardian = student.getGuardian();
-                        
+
                         GuardianDTO guardianDTO = null;
 
                         if (guardian != null) {
                             guardianDTO = new GuardianDTO(
-                            guardian.getId(),
-                            guardian.getName(),
-                            guardian.getEmail(),
-                            guardian.getPhone()
-                            );
+                                    guardian.getId(),
+                                    guardian.getName(),
+                                    guardian.getEmail(),
+                                    guardian.getPhone());
                         }
 
                         return new StudentResponseDTO(
@@ -115,17 +136,16 @@ public class StudentController {
                                 student.getDifficulties(),
                                 user.getRole(),
                                 guardian != null ? guardian.getId() : null,
-                                null, // registeredBy
-                                null, // createdAt
-                                null, // updatedAt
+                                null, 
+                                null, 
+                                null, 
                                 guardianDTO,
-                                student.getBirthDate()
-                        );
-       })
+                                student.getBirthDate());
+                    })
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(response);
-                    
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Collections.emptyList());
         }

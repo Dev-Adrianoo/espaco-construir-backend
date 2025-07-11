@@ -51,6 +51,8 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             // 1. Rotas Públicas
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/guardians/register").permitAll()

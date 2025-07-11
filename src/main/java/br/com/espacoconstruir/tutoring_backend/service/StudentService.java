@@ -1,6 +1,8 @@
 package br.com.espacoconstruir.tutoring_backend.service;
 
+import br.com.espacoconstruir.tutoring_backend.dto.GuardianDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.StudentDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.model.Role;
 import br.com.espacoconstruir.tutoring_backend.model.Schedule;
 import br.com.espacoconstruir.tutoring_backend.model.Student;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -30,6 +33,51 @@ public class StudentService {
     @Autowired
     private ScheduleService scheduleService;
 
+    public List<Student> findByStudentsRegisteredBy(Long userId){
+        return studentRepository.findByRegisteredBy_Id(userId);
+
+    }
+
+
+    public List<StudentResponseDTO> convertToDtoList(List<Student> students) {
+        return students.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
+    public StudentResponseDTO convertToDto(Student student) {
+        User user = student.getUser();
+        User guardian = student.getGuardian();
+        GuardianDTO guardianDTO = null;
+
+        if (guardian != null){
+            guardianDTO = new GuardianDTO(
+                guardian.getId(),
+                guardian.getName(),
+                guardian.getEmail(),
+                guardian.getPhone()
+            );
+        }
+        
+        return new StudentResponseDTO(
+            student.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getPhone(),
+            user.getAge(),
+            user.getGrade(),
+            user.getCondition(),
+            user.getDifficulties(),
+            user.getRole(),
+            guardian != null ? guardian.getId() : null,
+            student.getRegisteredBy() != null ? student.getRegisteredBy().getId() : null,
+            null,
+            null,
+            guardianDTO,
+            student.getBirthDate()
+        );
+    }
+
     public User register(StudentDTO dto) {
 
         User responsibleUser = userService.findById(dto.getGuardianId());
@@ -44,7 +92,7 @@ public class StudentService {
         studentUser.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
         studentUser.setPassword("");
 
-        // Gerar um email único para o aluno usando um timestamp
+       
         String timestamp = String.valueOf(System.currentTimeMillis());
         String studentEmail = "aluno." + timestamp + "@default.com";
         studentUser.setEmail(studentEmail);
@@ -52,7 +100,7 @@ public class StudentService {
 
         User createdStudentUser = userService.register(studentUser);
 
-        // Criar a entidade do
+        // Criar a entidade do aluno
         Student student = new Student();
         student.setName(dto.getName());
         student.setGrade(dto.getGrade());
@@ -62,7 +110,11 @@ public class StudentService {
         student.setUser(createdStudentUser);
         student.setGuardian(responsibleUser);
 
-        
+        student.setRegisteredBy(responsibleUser);
+
+        if (dto.getBirthDate() != null) {
+            student.setAge(Period.between(dto.getBirthDate(), LocalDate.now()).getYears());
+        }
 
         studentRepository.save(student);
 

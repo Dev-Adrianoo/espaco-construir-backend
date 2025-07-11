@@ -14,4 +14,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByGuardian(User guardian);
 
     Optional<Student> findByUser(User user);
+
+    List<Student> findByRegisteredBy_Id(Long userId);
 }
