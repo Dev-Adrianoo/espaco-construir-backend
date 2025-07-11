@@ -46,10 +46,11 @@ public class StudentService {
     }
 
     public StudentResponseDTO convertToDto(Student student) {
+
         User user = student.getUser();
         User guardian = student.getGuardian();
+    
         GuardianDTO guardianDTO = null;
-
         if (guardian != null){
             guardianDTO = new GuardianDTO(
                 guardian.getId(),
@@ -64,10 +65,10 @@ public class StudentService {
             user.getName(),
             user.getEmail(),
             user.getPhone(),
-            user.getAge(),
-            user.getGrade(),
-            user.getCondition(),
-            user.getDifficulties(),
+            student.getAge(),
+            student.getGrade(),
+            student.getCondition(),
+            student.getDifficulties(),
             user.getRole(),
             guardian != null ? guardian.getId() : null,
             student.getRegisteredBy() != null ? student.getRegisteredBy().getId() : null,

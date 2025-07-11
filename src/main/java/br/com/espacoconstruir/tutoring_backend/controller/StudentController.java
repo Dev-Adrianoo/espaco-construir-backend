@@ -75,6 +75,7 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<List<StudentResponseDTO>> listAllStudents() {
         List<Student> students = studentRepository.findAll();
+
         List<StudentResponseDTO> response = students.stream()
                 .map(student -> {
                     User user = student.getUser();
@@ -96,9 +97,9 @@ public class StudentController {
                             student.getDifficulties(),
                             user.getRole(),
                             guardian != null ? guardian.getId() : null,
-                            null, // registeredBy
-                            null, // createdAt
-                            null, // updatedAt
+                            null, 
+                            null, 
+                            null, 
                             guardianDTO,
                             student.getBirthDate());
                 })
