@@ -15,6 +15,16 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
+
+class ForgotPasswordRequest {
+    private String email;
+    public String getEmail() {return email;}
+    public void setEmail(String email) {this.email = email;}
+}
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,6 +39,16 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request){
+
+        userService.processForgotPassword(request.getEmail());
+
+        return ResponseEntity.ok("Link de recuperação enviado");
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequestDTO request) {

@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAILERSEND_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

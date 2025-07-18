@@ -46,6 +46,19 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
+		<dependency>
+	<groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+    <groupId>me.paulschwarz</groupId>
+    <artifactId>spring-dotenv</artifactId>
+    <version>4.0.0</version> </dependency>
+	<!-- <dependency>
+    <groupId>com.github.resend</groupId>
+    <artifactId>resend-java</artifactId>
+    <version>0.8.0</version>
+	</dependency> -->
 		<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -144,5 +157,10 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 </project>

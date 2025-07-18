@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Entity
@@ -50,6 +51,12 @@ public class User {
     private String condition;
     @Transient
     private String difficulties;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expires")
+    private LocalDateTime passwordResetExpires;
 
     @Override
     public String toString() {

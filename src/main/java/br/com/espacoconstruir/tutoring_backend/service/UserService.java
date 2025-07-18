@@ -11,7 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
@@ -22,6 +26,28 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
+
+    public void processForgotPassword(String email) {
+        Optional<User> userOptional = userRepository.findByEmail((email));
+
+        if(!userOptional.isPresent()) {
+            return;
+
+        }
+        User user = userOptional.get();
+        String token = UUID.randomUUID().toString();
+
+        user.setPasswordResetToken(token);
+        System.out.println("DEBUG: Data atual antes de adicionar minutos: " + LocalDateTime.now());
+        user.setPasswordResetExpires(LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+        emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
