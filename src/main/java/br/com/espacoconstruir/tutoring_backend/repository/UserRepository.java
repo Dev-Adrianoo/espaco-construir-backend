@@ -10,4 +10,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String Email);
 
     List<User> findByRole(br.com.espacoconstruir.tutoring_backend.model.Role role);
+
+    Optional<User> findByPasswordResetToken(String token);
 }

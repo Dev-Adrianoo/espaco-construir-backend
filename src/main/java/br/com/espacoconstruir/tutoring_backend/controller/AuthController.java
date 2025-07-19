@@ -15,9 +15,8 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+
+import br.com.espacoconstruir.tutoring_backend.dto.ResetPasswordRequestDTO;
 
 
 class ForgotPasswordRequest {
@@ -25,6 +24,8 @@ class ForgotPasswordRequest {
     public String getEmail() {return email;}
     public void setEmail(String email) {this.email = email;}
 }
+
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,6 +40,18 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/reset-password") 
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDTO requestDTO) {
+        try {
+            userService.resetPassword(requestDTO.getToken(), requestDTO.getNewPassword());
+            return ResponseEntity.ok(("Senha redefinida com sucesso."));
+
+        }catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+
+        }
+    }
 
 
 
