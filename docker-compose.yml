@@ -21,6 +21,8 @@ services:
     container_name: n8n
     ports:
       - "5678:5678"
+    environment: 
+      WEBHOOK_TUNNEL_URL: 'http://n8n:5678/' 
     volumes:
       - n8n_data:/home/node/.n8n
     restart: always
@@ -39,6 +41,7 @@ services:
       JWT_EXPIRATION: 86400000
       ALLOWED_ORIGINS: http://localhost:5173
       N8N_WEBHOOK_URL: http://n8n:5678/webhook/Event
+      N8N_WEBHOOK_CANCELATION_LESSON: http://n8n:5678/webhook/cancel-lesson
     ports:
       - "8081:8081"
     depends_on:

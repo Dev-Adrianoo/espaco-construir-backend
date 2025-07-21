@@ -30,8 +30,6 @@ public class StudentService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    @Autowired
-    private ScheduleService scheduleService;
 
     public List<Student> findByStudentsRegisteredBy(Long userId){
         return studentRepository.findByRegisteredBy_Id(userId);
@@ -135,11 +133,6 @@ public class StudentService {
     public List<Student> findAll() {
         return studentRepository.findAll();
     }
-
-    public List<Student> findByTeacherId(Long teacherId) {
-        return scheduleService.getStudentsByTeacherId(teacherId);
-    }
-
    
 
     public User update(Long id, StudentDTO dto) {

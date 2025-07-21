@@ -56,6 +56,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             // 1. Rotas Públicas
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/guardians/register").permitAll()
+            .requestMatchers("api/teachers/register").permitAll()
 
             // 2. Regras Específicas de PROFESSORA
             .requestMatchers("/api/students/teacher/**").hasAuthority("PROFESSORA")

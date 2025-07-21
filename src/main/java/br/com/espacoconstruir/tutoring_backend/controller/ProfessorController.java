@@ -2,7 +2,9 @@ package br.com.espacoconstruir.tutoring_backend.controller;
 
 import br.com.espacoconstruir.tutoring_backend.dto.TeacherDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.TeacherResponseDTO;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
 import br.com.espacoconstruir.tutoring_backend.model.User;
+import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,21 @@ public class ProfessorController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ScheduleService scheduleService;
+
+    @GetMapping("/{teacherId}/students")
+    public ResponseEntity<List<Student>> getStudentsForTeacher(@PathVariable Long teacherId) {
+        List<Student> students = scheduleService.getStudentsByTeacherId(teacherId);
+        return ResponseEntity.ok(students);
+
+    }
+
+    // public List<Student> findByTeacherId(Long teacherId) {
+    //     return scheduleService.getStudentsByTeacherId(teacherId);
+    // }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> registerProfessor(@Valid @RequestBody TeacherDTO dto) {
@@ -53,7 +70,7 @@ public class ProfessorController {
         }
     }
 
-    // New exception handler for validation errors
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {

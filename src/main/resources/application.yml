@@ -39,7 +39,8 @@ cors:
   allowed-origins: ${ALLOWED_ORIGINS}
 
 n8n:
-  webhook-url: ${N8N_WEBHOOK_URL}
+  webhook-url-new-lesson: ${N8N_WEBHOOK_URL}
+  webhook-url-cancelation-lesson: ${N8N_WEBHOOK_CANCELATION_LESSON:http://localhost:5678/webhook/cancel-lesson}
 
 logging:
   level:

@@ -110,7 +110,7 @@ public class StudentController {
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<List<StudentResponseDTO>> getStudentsByTeacherId(@PathVariable Long teacherId) {
         try {
-            List<Student> students = studentService.findByTeacherId(teacherId);
+            List<Student> students = scheduleService.getStudentsByTeacherId(teacherId);
             List<StudentResponseDTO> response = students.stream()
                     .map(student -> {
                         User user = student.getUser();

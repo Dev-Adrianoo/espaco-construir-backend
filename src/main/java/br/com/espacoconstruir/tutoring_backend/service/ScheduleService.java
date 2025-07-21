@@ -8,21 +8,26 @@ import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
 import br.com.espacoconstruir.tutoring_backend.model.Student;
 import br.com.espacoconstruir.tutoring_backend.model.User;
-import br.com.espacoconstruir.tutoring_backend.model.Role;
 import br.com.espacoconstruir.tutoring_backend.repository.ScheduleRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.UserRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @Service
 public class ScheduleService {
@@ -31,10 +36,24 @@ public class ScheduleService {
   private ScheduleRepository scheduleRepository;
 
   @Autowired
+  private UserService userService;
+
+  @Autowired
+  private RestTemplate restTemplate;
+
+  @Autowired
   private UserRepository userRepository;
+
+
+  @Value("${N8N_WEBHOOK_CANCELATION_LESSON}")
+  private String n8nCancellationWeebhook;
 
   @Autowired
   private StudentRepository studentRepository;
+
+  @Autowired
+  private StudentService studentService;
+
 
   @Transactional
   public List<ScheduleDTO> createBooking(BookingRequestDTO bookingRequest) {
@@ -125,49 +144,71 @@ public class ScheduleService {
 
   @Transactional
   public ScheduleDTO updateScheduleStatus(Long scheduleId, ScheduleStatus newStatus) {
-    System.out.println("Tentando encontrar agendamento com ID: " + scheduleId);
+      
+      
+      Schedule schedule = scheduleRepository.findById(scheduleId)
+              .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado com id: " + scheduleId));
 
-    // Listar todos os agendamentos para debug
-    List<Schedule> allSchedules = scheduleRepository.findAll();
-    System.out.println("Total de agendamentos existentes: " + allSchedules.size());
-    System.out.println("Agendamentos existentes:");
-    for (Schedule s : allSchedules) {
-      System.out.println(String.format(
-          "ID: %d, Aluno: %s (ID: %d), Professor: %s, Status: %s, Data/Hora: %s",
-          s.getId(),
-          s.getStudent().getName(),
-          s.getStudent().getId(),
-          s.getTeacher() != null ? s.getTeacher().getName() : "Não definido",
-          s.getStatus(),
-          s.getStartTime()));
-    }
+      
+      schedule.setStatus(newStatus);
+      Schedule updatedSchedule = scheduleRepository.save(schedule);
 
-    Schedule schedule = scheduleRepository.findById(scheduleId)
-        .orElseThrow(() -> new ResourceNotFoundException("Schedule not found"));
+      
+      if (newStatus == ScheduleStatus.CANCELLED) {
+          System.out.println("[DEBUG] Status CANCELLED detectado. Preparando para notificar o n8n.");
+          
+          try {
+              User teacher = updatedSchedule.getTeacher();
+              Student student = updatedSchedule.getStudent();
+              User guardian = student.getGuardian(); 
 
-    // Verificar se o aluno pertence ao responsável antes de permitir o cancelamento
-    var auth = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println("Auth: " + auth);
-    System.out.println("Principal: " + auth.getPrincipal());
-    System.out.println("Authorities: " + auth.getAuthorities());
+              if (guardian == null) {
+                  throw new RuntimeException("Responsável (Guardian) não encontrado para o aluno: " + student.getName());
+              }
 
-    String userEmail = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
-    User currentUser = userRepository.findByEmail(userEmail)
-        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+              Map<String, Object> payload = buildN8nCancellationPayload(teacher, student, guardian, updatedSchedule);
 
-    System.out.println("Current user: " + currentUser);
-    System.out.println("Current user role: " + currentUser.getRole());
+              HttpHeaders headers = new HttpHeaders();
+              headers.setContentType(MediaType.APPLICATION_JSON);
+              HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+              
+              restTemplate.postForEntity(n8nCancellationWeebhook, request, String.class);
+              System.out.println("[DEBUG] Notificação de cancelamento enviada para o n8n com sucesso.");
 
-    if (currentUser.getRole() == Role.RESPONSAVEL) {
-      Student student = schedule.getStudent();
-      if (student == null || student.getGuardian() == null
-          || !student.getGuardian().getId().equals(currentUser.getId())) {
-        throw new RuntimeException("Você não tem permissão para cancelar este agendamento");
+          } catch (Exception e) {
+              System.err.println("[ERRO] Falha ao enviar notificação de cancelamento para o n8n.");
+              e.printStackTrace();
+
+          }
       }
-    }
 
-    schedule.setStatus(newStatus);
-    return convertToDTO(scheduleRepository.save(schedule));
+      // 4. Retorna a aula atualizada
+      return convertToDTO(updatedSchedule);
+  }
+
+  private Map<String, Object> buildN8nCancellationPayload(User teacher, Student student, User guardian, Schedule schedule) {
+      Map<String, Object> payload = new HashMap<>();
+      
+      Map<String, Object> teacherMap = new HashMap<>();
+      teacherMap.put("id", teacher.getId());
+      teacherMap.put("name", teacher.getName());
+      payload.put("teacher", teacherMap);
+
+      Map<String, Object> studentMap = new HashMap<>();
+      studentMap.put("name", student.getName());
+      payload.put("student", studentMap);
+
+      Map<String, Object> guardianMap = new HashMap<>();
+      guardianMap.put("id", guardian.getId());
+      guardianMap.put("phone", guardian.getPhone());
+      payload.put("guardian", guardianMap);
+
+      Map<String, Object> eventDetailsMap = new HashMap<>();
+      eventDetailsMap.put("start_time_iso", schedule.getStartTime().toString());
+      eventDetailsMap.put("title", "Aula " + student.getName());
+      payload.put("event_details", eventDetailsMap);
+
+      return payload;
   }
 
   @Transactional
