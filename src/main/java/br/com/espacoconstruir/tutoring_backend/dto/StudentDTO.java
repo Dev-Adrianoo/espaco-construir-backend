@@ -26,7 +26,7 @@ public class StudentDTO {
   }
 
   public StudentDTO(String name, Integer age, String grade,
-      String difficulties, String condition, Long guardianId) {
+      String difficulties, String condition, Long guardianId, LocalDate birthDate) {
     this.name = name;
     this.grade = grade;
     this.difficulties = difficulties;

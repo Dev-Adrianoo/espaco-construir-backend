@@ -116,22 +116,23 @@ public class GuardianController {
       User guardian = userService.findById(responsavelId);
       List<Student> students = studentService.getByGuardian(guardian);
       List<StudentResponseDTO> response = students.stream()
-          .map(s -> new StudentResponseDTO(
-              s.getId(),
-              s.getName(),
+          .map(student -> new StudentResponseDTO(
+              student.getId(),
+              student.getName(),
               null,
               null,
-              s.getAge(),
-              s.getGrade(),
-              s.getCondition(),
-              s.getDifficulties(),
+              student.getAge(),
+              student.getGrade(),
+              student.getCondition(),
+              student.getDifficulties(),
               br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO,
               guardian.getId(),
               null,
               null,
               null,
-              
-              new GuardianDTO(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getPhone()), null))
+              new GuardianDTO(guardian.getId(), guardian.getName(), guardian.getEmail(), guardian.getPhone()),
+              student.getBirthDate()           
+              ))
           .collect(Collectors.toList());
       return ResponseEntity.ok(response);
     } catch (Exception e) {
