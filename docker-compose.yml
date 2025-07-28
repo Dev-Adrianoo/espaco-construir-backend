@@ -24,7 +24,7 @@ services:
     environment: 
       WEBHOOK_TUNNEL_URL: 'http://n8n:5678/' 
     volumes:
-      - n8n_data:/home/node/.n8n
+      - n8n_data:/home/node/.n8nm
     restart: always
     networks:
       - app-network
