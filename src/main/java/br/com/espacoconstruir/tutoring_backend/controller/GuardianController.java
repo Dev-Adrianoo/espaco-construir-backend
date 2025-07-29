@@ -20,7 +20,6 @@ import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 
 @RestController
 @RequestMapping("/api/guardians")
-@CrossOrigin(origins = "http://localhost:5173")
 public class GuardianController {
 
   @Autowired

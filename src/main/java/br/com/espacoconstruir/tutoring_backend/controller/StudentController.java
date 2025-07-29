@@ -7,7 +7,6 @@ import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.StudentService;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
 import org.springframework.security.core.Authentication;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,6 @@ import br.com.espacoconstruir.tutoring_backend.model.Student;
 
 @RestController
 @RequestMapping("/api/students")
-@CrossOrigin(origins = "http://localhost:5173")
 public class StudentController {
 
     @Autowired
