@@ -19,7 +19,7 @@ import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
 import br.com.espacoconstruir.tutoring_backend.model.Student;
 
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/students")
 public class StudentController {
 
     @Autowired

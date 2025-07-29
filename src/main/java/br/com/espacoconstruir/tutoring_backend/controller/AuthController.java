@@ -28,7 +28,7 @@ class ForgotPasswordRequest {
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired

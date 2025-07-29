@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/schedules")
 public class ScheduleController {
 
     @Autowired
