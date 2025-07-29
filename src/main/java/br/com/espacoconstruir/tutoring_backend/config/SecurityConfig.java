@@ -82,7 +82,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .requestMatchers("/teachers").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             
             // 6. Qualquer outra rota precisa estar autenticada
-            .anyRequest().authenticated()
+            .anyRequest().permitAll()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
