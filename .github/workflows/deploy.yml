@@ -26,4 +26,4 @@ jobs:
             cd ..
 
             echo ">>> Reconstruindo e reiniciando os containers..."
-            docker-compose up --build -d
+            docker compose up --build -d
