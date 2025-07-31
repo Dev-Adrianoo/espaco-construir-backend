@@ -42,6 +42,7 @@ services:
       ALLOWED_ORIGINS: http://localhost:5173
       N8N_WEBHOOK_URL: http://n8n:5678/webhook/Event
       N8N_WEBHOOK_CANCELATION_LESSON: http://n8n:5678/webhook/cancel-lesson
+      N8N_WEBHOOK_PRODUCTION_URL: 
     ports:
       - "8081:8081"
     depends_on:
