@@ -20,12 +20,28 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-              echo ">>> Limpando backend antigo e clonando novamente..."
+              echo ">>> Clonando Evolution API se necessário..."
+              cd ~
+              if [ ! -d "evolution-api" ]; then
+                git clone https://github.com/EvolutionAPI/evolution-api.git
+              fi
+
+              echo ">>> Configurando arquivos da Evolution API..."
+              cd evolution-api
+              cp -n .env.example .env
+
+              echo ">>> Subindo Evolution API (com redis e postgres) e criando a rede evolution-net..."
+              docker compose up -d
+
+              echo ">>> Esperando a rede evolution-net e serviços estarem prontos..."
+              sleep 15
+
+              echo ">>> Limpando código anterior do backend..."
               rm -rf ~/espaco-construir-backend
               git clone https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/Dev-Adrianoo/espaco-construir-backend.git ~/espaco-construir-backend
 
-              echo ">>> Indo para o diretório com o docker-compose.yml..."
+              echo ">>> Subindo backend conectado à rede evolution-net..."
               cd ~/espaco-construir-backend
-
-              echo ">>> Reconstruindo e reiniciando os containers..."
               docker compose up --build -d
+
+              echo "🎉 Backend + Evolution API no ar com sucesso! 🎉"
