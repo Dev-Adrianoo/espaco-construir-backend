@@ -20,10 +20,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            echo ">>> Atualizando código do Backend..."
-            rm -rf espaco-construir-backend
-            git clone https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/Dev-Adrianoo/espaco-construir-backend.git
-            cd ..
+              echo ">>> Limpando backend antigo e clonando novamente..."
+              rm -rf ~/espaco-construir-backend
+              git clone https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/Dev-Adrianoo/espaco-construir-backend.git ~/espaco-construir-backend
 
-            echo ">>> Reconstruindo e reiniciando os containers..."
-            docker compose up --build -d
+              echo ">>> Indo para o diretório com o docker-compose.yml..."
+              cd ~/espaco-construir-backend
+
+              echo ">>> Reconstruindo e reiniciando os containers..."
+              docker compose up --build -d
