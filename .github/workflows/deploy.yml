@@ -6,42 +6,34 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+      - name: login on Docker Hub
+        uses: docker/login-action@v3
         with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: devadrianoo/instituto-desenvolver-backend:latest
+        
+      - name: Deploy in EC2
+        uses: appleboy/ssh-action@master
+        with: 
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
           script: |
-              echo ">>> Clonando Evolution API se necessário..."
-              cd ~
-              if [ ! -d "evolution-api" ]; then
-                git clone https://github.com/EvolutionAPI/evolution-api.git
-              fi
-
-              echo ">>> Configurando arquivos da Evolution API..."
-              cd evolution-api
-              cp -n .env.example .env
-
-              echo ">>> Subindo Evolution API (com redis e postgres) e criando a rede evolution-net..."
-              docker compose up -d
-
-              echo ">>> Esperando a rede evolution-net e serviços estarem prontos..."
-              sleep 15
-
-              echo ">>> Limpando código anterior do backend..."
-              rm -rf ~/espaco-construir-backend
-              git clone https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/Dev-Adrianoo/espaco-construir-backend.git ~/espaco-construir-backend
-
-              echo ">>> Subindo backend conectado à rede evolution-net..."
-              cd ~/espaco-construir-backend
-              docker compose up --build -d
-
-              echo "🎉 Backend + Evolution API no ar com sucesso! 🎉"
+            cd /home/ubuntu/desenvolver_instituto
+            docker-compose pull backend
+            docker-compose up -d --no-deps backend
+            docker image prune -af
+        

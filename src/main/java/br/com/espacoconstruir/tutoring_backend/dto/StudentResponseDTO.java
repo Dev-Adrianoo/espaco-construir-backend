@@ -24,11 +24,11 @@ public class StudentResponseDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
   private LocalDate birthDate;
 
-  // Constructor vazio
+  
   public StudentResponseDTO() {
   }
 
-  // Constructor com todos os campos
+ 
   public StudentResponseDTO(Long id, String name, String email, String phone, Integer age,
       String grade, String condition, String difficulties, Role role, Long guardianId,
       Long registeredBy, LocalDateTime createdAt, LocalDateTime updatedAt, GuardianDTO guardian, LocalDate birthDate) {

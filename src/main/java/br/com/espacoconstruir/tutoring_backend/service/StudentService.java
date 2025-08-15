@@ -85,7 +85,7 @@ public class StudentService {
             throw new RuntimeException("O usuário associado ao cadastro do aluno precisa ser um Responsável ou uma Professora");
         }
 
-        // criando user para o Aluno
+        
         User studentUser = new User();
         studentUser.setName(dto.getName());
         studentUser.setRole(br.com.espacoconstruir.tutoring_backend.model.Role.ALUNO);
@@ -99,7 +99,7 @@ public class StudentService {
 
         User createdStudentUser = userService.register(studentUser);
 
-        // Criar a entidade do aluno
+        
         Student student = new Student();
         student.setName(dto.getName());
         student.setGrade(dto.getGrade());

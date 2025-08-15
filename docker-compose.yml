@@ -4,10 +4,8 @@ services:
   tutoring_db:
     image: postgres:15
     container_name: tutoring_db
-    environment:
-      POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: tutoring_db
+    env_file:
+      - .env
     ports:
       - "5433:5432"
     volumes:
@@ -30,19 +28,10 @@ services:
       - app-network
 
   backend:
-    build: .
+    image: devadrianoo/instituto-desenvolver-backend:latest
     container_name: espaco_construir_backend
-    environment:
-      DB_URL: jdbc:postgresql://tutoring_db:5432/tutoring_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      SERVER_PORT: 8081
-      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      JWT_EXPIRATION: 86400000
-      ALLOWED_ORIGINS: http://localhost:5173
-      N8N_WEBHOOK_URL: http://n8n:5678/webhook/Event
-      N8N_WEBHOOK_CANCELATION_LESSON: http://n8n:5678/webhook/cancel-lesson
-      N8N_WEBHOOK_PRODUCTION_URL: 
+    env_file:
+      - .env
     ports:
       - "8081:8081"
     depends_on:
