@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
 
 @RestController
-@RequestMapping("/guardians")
+@RequestMapping("/api/guardians")
 public class GuardianController {
 
   @Autowired

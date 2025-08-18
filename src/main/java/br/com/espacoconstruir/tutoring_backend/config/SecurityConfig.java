@@ -33,13 +33,14 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-        // .cors(Customizer.withDefaults())
+        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
 
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/error").permitAll()
             // 1. Rotas Públicas
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/guardians/register").permitAll()
