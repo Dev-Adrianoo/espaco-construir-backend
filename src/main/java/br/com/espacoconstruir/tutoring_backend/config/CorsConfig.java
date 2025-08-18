@@ -8,7 +8,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 public class CorsConfig {
@@ -20,7 +19,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Fallback to empty list if allowedOrigins is null or empty
+      
         String[] origins = (allowedOrigins != null && !allowedOrigins.isEmpty()) ? allowedOrigins.split(",") : new String[0];
         configuration.setAllowedOrigins(Arrays.asList(origins));
 
