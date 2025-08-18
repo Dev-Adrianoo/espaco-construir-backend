@@ -1,24 +1,29 @@
 package br.com.espacoconstruir.tutoring_backend.config;
 
+import br.com.espacoconstruir.tutoring_backend.security.CustomAccessDeniedHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import br.com.espacoconstruir.tutoring_backend.security.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 public class SecurityConfig {
 
   @Autowired
   private JwtAuthenticationFilter jwtAuthFilter;
+
+  @Autowired
+  private CustomAccessDeniedHandler customAccessDeniedHandler;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -30,6 +35,7 @@ public class SecurityConfig {
     http
         .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
+        .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
 
@@ -41,7 +47,7 @@ public class SecurityConfig {
 
             // 2. Regras Específicas de PROFESSORA
             .requestMatchers("/api/students/teacher/**").hasAuthority("PROFESSORA")
-            
+
             // 3. Regras Específicas de RESPONSAVEL
             .requestMatchers("/api/guardians/children/**").hasAuthority("RESPONSAVEL")
 
@@ -55,7 +61,7 @@ public class SecurityConfig {
             .requestMatchers("/api/schedules/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             .requestMatchers("/api/history/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             .requestMatchers("/api/teachers").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            
+
             // 6. Qualquer outra rota precisa estar autenticada
             .anyRequest().authenticated()
         )
