@@ -35,7 +35,7 @@ public class GuardianController {
   public ResponseEntity<?> registerGuardian(@Valid @RequestBody GuardianDTO dto) {
 
     System.out.println("[DEBUG] - KRATOS PASSOU POR AQUI!");
-    
+
     try {
       User user = new User();
       user.setName(dto.getName());
@@ -56,7 +56,8 @@ public class GuardianController {
     try {
       User guardian = userService.findById(id);
       return ResponseEntity.ok(guardian);
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       return ResponseEntity.notFound().build();
     }
   }
@@ -72,7 +73,8 @@ public class GuardianController {
         user.setPassword(dto.getPassword());
       }
       return ResponseEntity.ok(userService.update(user));
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
@@ -82,7 +84,8 @@ public class GuardianController {
     try {
       userService.delete(id);
       return ResponseEntity.noContent().build();
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
