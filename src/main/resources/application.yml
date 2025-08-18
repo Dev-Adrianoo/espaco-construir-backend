@@ -30,6 +30,7 @@ app:
 
 server:
   port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
 
 jwt:
   secret: ${JWT_SECRET}
