@@ -33,6 +33,9 @@ public class GuardianController {
 
   @PostMapping("/register")
   public ResponseEntity<?> registerGuardian(@Valid @RequestBody GuardianDTO dto) {
+
+    System.out.println("[DEBUG] - KRATOS PASSOU POR AQUI!");
+    
     try {
       User user = new User();
       user.setName(dto.getName());
