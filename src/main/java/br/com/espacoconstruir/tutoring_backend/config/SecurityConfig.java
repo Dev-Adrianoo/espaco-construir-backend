@@ -60,26 +60,26 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             // 1. Rotas Públicas
-            .requestMatchers("/auth/**").permitAll()
-            .requestMatchers("/guardians/register").permitAll()
-            .requestMatchers("/teachers/register").permitAll()
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/guardians/register").permitAll()
+            .requestMatchers("/api/teachers/register").permitAll()
 
             // 2. Regras Específicas de PROFESSORA
-            .requestMatchers("/students/teacher/**").hasAuthority("PROFESSORA")
+            .requestMatchers("/api/students/teacher/**").hasAuthority("PROFESSORA")
             
             // 3. Regras Específicas de RESPONSAVEL
-            .requestMatchers("/guardians/children/**").hasAuthority("RESPONSAVEL")
+            .requestMatchers("/api/guardians/children/**").hasAuthority("RESPONSAVEL")
 
             // 4. Regras para /students (agora explícitas e corretas)
-            .requestMatchers(HttpMethod.POST, "/students/register").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers(HttpMethod.PUT, "/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers(HttpMethod.GET, "/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers(HttpMethod.DELETE, "/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.POST, "/api/students/register").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.PUT, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.GET, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
 
             // 5. Outras regras compartilhadas
-            .requestMatchers("/schedules/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers("/history/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
-            .requestMatchers("/teachers").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers("/api/schedules/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers("/api/history/**").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
+            .requestMatchers("/api/teachers").hasAnyAuthority("RESPONSAVEL", "PROFESSORA")
             
             // 6. Qualquer outra rota precisa estar autenticada
             .anyRequest().authenticated()
