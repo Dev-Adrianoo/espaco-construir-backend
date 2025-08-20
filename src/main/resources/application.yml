@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   mail:
     host: smtp-relay.brevo.com
     port: 587

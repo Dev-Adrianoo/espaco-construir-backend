@@ -19,6 +19,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import java.time.ZoneId; 
+import java.time.ZonedDateTime; 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,6 +61,18 @@ public class ScheduleService {
   public List<ScheduleDTO> createBooking(BookingRequestDTO bookingRequest) {
     LocalDate date = LocalDate.parse(bookingRequest.getDate());
     LocalTime time = LocalTime.parse(bookingRequest.getTime());
+
+
+    ZoneId brazilTimeZone = ZoneId.of("America/Sao_Paulo");
+
+    ZonedDateTime requestedDateTime = LocalDateTime.of(date, time).atZone(brazilTimeZone);
+
+    ZonedDateTime timeNow = ZonedDateTime.now(brazilTimeZone);
+
+    if (requestedDateTime.isBefore(timeNow)){
+      throw new IllegalArgumentException("not possible to schedule classes at time that have already passed.");
+    }
+
     LocalDateTime startTime = LocalDateTime.of(date, time);
     LocalDateTime endTime = startTime.plusHours(1); 
 
