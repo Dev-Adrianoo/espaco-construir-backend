@@ -143,7 +143,7 @@ public class ScheduleService {
   }
 
   public List<ScheduleDTO> getTeacherSchedules(Long teacherId) {
-    return scheduleRepository.findByTeacherId(teacherId)
+    return scheduleRepository.findByTeacherIdAndStatusNot(teacherId, ScheduleStatus.CANCELLED)
         .stream()
         .map(this::convertToDTO)
         .collect(Collectors.toList());
@@ -196,7 +196,7 @@ public class ScheduleService {
           }
       }
 
-      // 4. Retorna a aula atualizada
+ 
       return convertToDTO(updatedSchedule);
   }
 
@@ -231,7 +231,8 @@ public class ScheduleService {
   }
 
   public List<ScheduleDTO> getAllSchedules() {
-    return scheduleRepository.findAll()
+    
+    return scheduleRepository.findAllByStatusNot(ScheduleStatus.CANCELLED)
         .stream()
         .map(this::convertToDTO)
         .collect(Collectors.toList());

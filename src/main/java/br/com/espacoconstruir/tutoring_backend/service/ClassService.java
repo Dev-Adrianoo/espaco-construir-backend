@@ -14,15 +14,15 @@ public class ClassService {
   @Autowired
   private ClassRepository classRepository;
 
-  // Implement methods as needed
+
   public List<Class> getHistoryByStudent(Long alunoId) {
     return Collections.emptyList();
   }
 
-  // Novo método para retornar todos os horários com alunos
+ 
   public List<ScheduleWithStudentsDTO> getSchedulesWithStudents() {
     List<Class> allClasses = classRepository.findAll();
-    // Agrupa por data+hora
+    
     Map<String, List<Class>> grouped = allClasses.stream()
         .collect(Collectors.groupingBy(c -> c.getDate() + "_" + c.getTime()));
     List<ScheduleWithStudentsDTO> result = new ArrayList<>();

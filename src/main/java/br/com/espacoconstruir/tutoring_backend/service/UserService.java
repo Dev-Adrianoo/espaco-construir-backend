@@ -23,7 +23,7 @@ import java.util.Collections;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Value("${app.frontend-url}")
+    @Value("${app.frontend-url-prod}")
     private String frontendUrl;
 
     @Autowired

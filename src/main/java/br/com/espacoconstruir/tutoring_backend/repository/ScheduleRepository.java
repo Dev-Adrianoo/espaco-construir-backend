@@ -1,6 +1,7 @@
 package br.com.espacoconstruir.tutoring_backend.repository;
 
 import br.com.espacoconstruir.tutoring_backend.model.Schedule;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
 import br.com.espacoconstruir.tutoring_backend.model.Student;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   boolean existsByStudentIdAndStartTimeBetween(Long studentId, LocalDateTime start, LocalDateTime end);
 
   boolean existsByTeacherIdAndStartTimeBetween(Long teacherId, LocalDateTime start, LocalDateTime end);
+
+  List<Schedule> findAllByStatusNot(ScheduleStatus status);
+
+  List<Schedule> findByTeacherIdAndStatusNot(Long teacherId, ScheduleStatus status);
 }

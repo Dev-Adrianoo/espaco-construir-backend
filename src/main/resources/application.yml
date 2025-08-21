@@ -28,8 +28,8 @@ spring:
     enabled: true
     baseline-on-migrate: true
 app:
-  frontend-url: ${FRONTEND_URL:http://localhost:5173}
-
+  frontend-url-dev: ${FRONTEND_URL:http://localhost:5173}
+  frontend-url-prod: ${https://app.desenvolverinstituto.com}
 server:
   port: ${SERVER_PORT:8081}
   forward-headers-strategy: framework
