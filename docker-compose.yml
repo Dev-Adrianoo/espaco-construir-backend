@@ -29,6 +29,7 @@ services:
 
   backend:
     image: devadrianoo/instituto-desenvolver-backend:latest
+    # build: .
     container_name: espaco_construir_backend
     env_file:
       - .env

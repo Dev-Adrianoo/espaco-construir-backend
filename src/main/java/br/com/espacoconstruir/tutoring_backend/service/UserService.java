@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
@@ -59,6 +59,11 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        
+        if (!user.isEmailVerified()) {
+            
+            throw new DisabledException("E-mail não verificado, Por favor, confirme seu e-mail para fazer login.");
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
@@ -70,8 +75,36 @@ public class UserService implements UserDetailsService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("Email already registered");
         }
+
+        user.setEmail(user.getEmail().toLowerCase());
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        user.setEmailVerified(false);
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        User savedUser = userRepository.save(user);
+
+        emailService.sendVerificationEmail(savedUser, token);
+
+        return savedUser;
+
+    }
+
+    public User verifyEmail(String token) {
+
+        Optional<User> userOptional = userRepository.findByVerificationToken(token);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            user.setEmailVerified(true);
+            user.setVerificationToken(null);
+            userRepository.save(user);
+            return user;
+        }
+
+        return null;
+
     }
 
     public User findById(Long id) {

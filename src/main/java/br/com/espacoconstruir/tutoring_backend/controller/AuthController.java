@@ -52,7 +52,26 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> VerifyEmail(@RequestParam("token") String token) {
+        User verifiedUser = userService.verifyEmail(token);
 
+        if (verifiedUser != null) {
+            UserDetails userDetails = userService.loadUserByUsername(verifiedUser.getEmail());
+            String jwt = jwtService.generateToken(userDetails);
+
+            AuthResponseDTO response = new AuthResponseDTO(
+                jwt,
+                verifiedUser.getId(),
+                verifiedUser.getName(),
+                verifiedUser.getEmail(),
+                verifiedUser.getRole()
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body("Token de verificação inválido ou expirado.");
+        }
+    }
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request){

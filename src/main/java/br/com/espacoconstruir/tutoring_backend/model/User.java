@@ -35,6 +35,12 @@ public class User {
     @Column(unique = true)
     private String cnpj;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
