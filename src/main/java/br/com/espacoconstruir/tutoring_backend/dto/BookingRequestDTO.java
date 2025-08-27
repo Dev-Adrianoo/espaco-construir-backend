@@ -1,7 +1,8 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
-import lombok.Data;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class BookingRequestDTO {
@@ -14,6 +15,15 @@ public class BookingRequestDTO {
     private String difficulties;
     private String condition;
     private String meetingLink;
+    private String recurrenceType;
+
+    public String getRecurrenceType() {
+        return recurrenceType;
+    }
+
+    public void  setRecurrenceType(String recurrenceType) {
+        this.recurrenceType = recurrenceType;
+    }
 
     public String getDifficulties() {
         return difficulties;

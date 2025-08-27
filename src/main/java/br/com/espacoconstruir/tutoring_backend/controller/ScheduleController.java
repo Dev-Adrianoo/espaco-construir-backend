@@ -1,6 +1,29 @@
 package br.com.espacoconstruir.tutoring_backend.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
 import br.com.espacoconstruir.tutoring_backend.dto.BookingRequestDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.CancellationRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.ScheduleDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.ScheduleWithStudentsDTO;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
@@ -10,20 +33,6 @@ import br.com.espacoconstruir.tutoring_backend.service.ClassService;
 import br.com.espacoconstruir.tutoring_backend.service.ScheduleService;
 import br.com.espacoconstruir.tutoring_backend.service.StudentService;
 import br.com.espacoconstruir.tutoring_backend.service.UserService;
-
-import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import org.springframework.http.HttpHeaders;
-import java.util.List;
-import java.util.Map;
-
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -75,13 +84,19 @@ public class ScheduleController {
 
             String startDateTimeISO = bookingRequest.getDate() + "T" + bookingRequest.getTime() + ":00-03:00";
             String durationMinutes = "60";
-
+            
+            String recurrenceTypeToSend = "ONCE";
+            if (bookingRequest.getRecurrenceType() != null && !bookingRequest.getRecurrenceType().isBlank()){
+                recurrenceTypeToSend = bookingRequest.getRecurrenceType();
+            }
+            
             Map<String, String> n8nPayload = new HashMap<>();
             n8nPayload.put("studentName", studentUser.getName());
             n8nPayload.put("contactParent", guardian.getPhone());
             n8nPayload.put("teacherName", teacher.getName());
             n8nPayload.put("startDateTime", startDateTimeISO);
             n8nPayload.put("durationMinutes", durationMinutes);
+            n8nPayload.put("recurrenceType", recurrenceTypeToSend);
 
             System.out.println("[DEBUG] Preparando para enviar payload para n8n:");
             System.out.println("[DEBUG] URL do webhook: " + n8nWebhookUrl);
@@ -109,6 +124,12 @@ public class ScheduleController {
         }
 
         return ResponseEntity.ok((createdSchedules));
+    }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<Void> cancelBooking(@RequestBody CancellationRequestDTO cancellationRequest) {
+        scheduleService.cancelBooking(cancellationRequest);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping

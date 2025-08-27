@@ -1,13 +1,19 @@
 package br.com.espacoconstruir.tutoring_backend.service;
 
-import br.com.espacoconstruir.tutoring_backend.model.Class;
-import br.com.espacoconstruir.tutoring_backend.model.Student;
-import br.com.espacoconstruir.tutoring_backend.dto.ScheduleWithStudentsDTO;
-import br.com.espacoconstruir.tutoring_backend.repository.ClassRepository;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import br.com.espacoconstruir.tutoring_backend.dto.ScheduleWithStudentsDTO;
+import br.com.espacoconstruir.tutoring_backend.model.Class;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
+import br.com.espacoconstruir.tutoring_backend.repository.ClassRepository;
 
 @Service
 public class ClassService {

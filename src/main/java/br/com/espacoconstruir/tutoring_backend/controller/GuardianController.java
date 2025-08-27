@@ -1,22 +1,32 @@
 package br.com.espacoconstruir.tutoring_backend.controller;
 
-import br.com.espacoconstruir.tutoring_backend.dto.GuardianDTO;
-import br.com.espacoconstruir.tutoring_backend.dto.GuardianResponseDTO;
-import br.com.espacoconstruir.tutoring_backend.model.User;
-import br.com.espacoconstruir.tutoring_backend.service.UserService;
-import br.com.espacoconstruir.tutoring_backend.service.StudentService;
-import br.com.espacoconstruir.tutoring_backend.model.Student;
-import br.com.espacoconstruir.tutoring_backend.service.ClassService;
-import br.com.espacoconstruir.tutoring_backend.model.Class;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.espacoconstruir.tutoring_backend.dto.GuardianDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.GuardianResponseDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.StudentResponseDTO;
+import br.com.espacoconstruir.tutoring_backend.model.Class;
+import br.com.espacoconstruir.tutoring_backend.model.Student;
+import br.com.espacoconstruir.tutoring_backend.model.User;
+import br.com.espacoconstruir.tutoring_backend.service.ClassService;
+import br.com.espacoconstruir.tutoring_backend.service.StudentService;
+import br.com.espacoconstruir.tutoring_backend.service.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/guardians")
@@ -104,11 +114,33 @@ public class GuardianController {
     }
   }
 
-  @GetMapping("/history")
+    @GetMapping("/history")
   public ResponseEntity<List<Class>> getClassHistory(@RequestParam Long alunoId) {
-    List<Class> history = classService.getHistoryByStudent(alunoId);
-    return ResponseEntity.ok(history);
+      List<Class> history = classService.getHistoryByStudent(alunoId);
+      return ResponseEntity.ok(history);
   }
+
+
+  // @GetMapping("/history")
+  // public ResponseEntity<List<Class>> getClassHistory(@RequestParam Long alunoId) {
+  //   List<Schedule> scheduleHistory = classService.getHistoryByStudent(alunoId);
+
+  //   List<ClassHistoryDTO> historyResponse = scheduleHistory.stream()
+  //       .map(schedule -> {
+  //           ClassHistoryDTO dto = new ClassHistoryDTO();
+  //           dto.setId(schedule.getId());
+  //           dto.setStudentName(schedule.getStudent().getName());
+  //           dto.setTeacherName(schedule.getTeacher() != null ? schedule.getTeacher().getName() : null);
+  //           dto.setSubject(schedule.getSubject());
+  //           dto.setDate(schedule.getStartTime().toLocalDate());
+  //           dto.setTime(schedule.getStartTime().toLocalTime());
+  //           dto.setStatus(schedule.getStatus().name());
+  //           return dto;
+  //       })
+  //       .collect(Collectors.toList());
+
+  //   return ResponseEntity.ok(historyResponse);
+  // }
 
   @GetMapping("/children")
   public ResponseEntity<List<StudentResponseDTO>> getChildrenByResponsible(

@@ -1,10 +1,11 @@
 package br.com.espacoconstruir.tutoring_backend.dto;
 
-import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
-import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
-import lombok.Data;
-
 import java.time.LocalDateTime;
+
+import br.com.espacoconstruir.tutoring_backend.model.RecurrenceType;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
+import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
+import lombok.Data;
 
 @Data
 public class ScheduleDTO {
@@ -21,6 +22,10 @@ public class ScheduleDTO {
     private String studentName;
     private String subject;
     private String description;
+    private RecurrenceType recurrenceType;
+    private String recurrenceId;
+
+    
 
     public String getDifficulties() {
         return difficulties;

@@ -1,0 +1,2 @@
+ALTER TABLE schedules
+ADD COLUMN recurrence_type VARCHAR(20) NOT NULL DEFAULT 'ONCE';

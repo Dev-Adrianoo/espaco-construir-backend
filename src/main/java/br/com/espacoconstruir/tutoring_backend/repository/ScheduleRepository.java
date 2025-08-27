@@ -35,4 +35,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   List<Schedule> findAllByStatusNot(ScheduleStatus status);
 
   List<Schedule> findByTeacherIdAndStatusNot(Long teacherId, ScheduleStatus status);
+
+  List<Schedule> findByRecurrenceIdAndStatusIn(String recurrenceId, List<ScheduleStatus> statuses);
 }

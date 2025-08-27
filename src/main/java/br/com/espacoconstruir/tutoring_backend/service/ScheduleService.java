@@ -1,8 +1,31 @@
 package br.com.espacoconstruir.tutoring_backend.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import br.com.espacoconstruir.tutoring_backend.dto.BookingRequestDTO;
+import br.com.espacoconstruir.tutoring_backend.dto.CancellationRequestDTO;
 import br.com.espacoconstruir.tutoring_backend.dto.ScheduleDTO;
 import br.com.espacoconstruir.tutoring_backend.exception.ResourceNotFoundException;
+import br.com.espacoconstruir.tutoring_backend.model.RecurrenceType;
 import br.com.espacoconstruir.tutoring_backend.model.Schedule;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleModality;
 import br.com.espacoconstruir.tutoring_backend.model.ScheduleStatus;
@@ -11,24 +34,6 @@ import br.com.espacoconstruir.tutoring_backend.model.User;
 import br.com.espacoconstruir.tutoring_backend.repository.ScheduleRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.StudentRepository;
 import br.com.espacoconstruir.tutoring_backend.repository.UserRepository;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import java.time.ZoneId; 
-import java.time.ZonedDateTime; 
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -85,9 +90,14 @@ public class ScheduleService {
           .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
     }
 
+    String recurrenceId = null;
+    if(bookingRequest.getRecurrenceType() != null &&  bookingRequest.getRecurrenceType().equalsIgnoreCase("WEEKLY")) {
+      recurrenceId = UUID.randomUUID().toString();
+    }
+
     List<ScheduleDTO> result = new java.util.ArrayList<>();
     for (Long studentId : bookingRequest.getStudentIds()) {
-      Student student = studentRepository.findById(studentId)
+    Student student = studentRepository.findById(studentId)
           .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
       Schedule schedule = new Schedule();
       schedule.setStudent(student);
@@ -99,10 +109,46 @@ public class ScheduleService {
       schedule.setStatus(ScheduleStatus.SCHEDULED);
       schedule.setModality(ScheduleModality.valueOf(bookingRequest.getModality().toUpperCase()));
       schedule.setMeetingLink(bookingRequest.getMeetingLink());
+      
+      
+      if(bookingRequest.getRecurrenceType() != null && !bookingRequest.getRecurrenceType().isEmpty()) {
+        schedule.setRecurrenceType(RecurrenceType.valueOf(bookingRequest.getRecurrenceType().toUpperCase()));
+
+      }else {
+        schedule.setRecurrenceType(RecurrenceType.ONCE);
+
+      }
+
+      schedule.setRecurrenceId(recurrenceId);
+
       Schedule savedSchedule = scheduleRepository.save(schedule);
       result.add(convertToDTO(savedSchedule));
+      
     }
     return result;
+  }
+
+
+  @Transactional
+  public void cancelBooking(CancellationRequestDTO request) {
+
+    Schedule scheduleToCancel = scheduleRepository.findById(request.getScheduleId())
+             .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado com id: " + request.getScheduleId()));
+
+    String scope = request.getScope() != null ? request.getScope() : "SINGLE";
+
+    if ("ALL_RECURRING".equalsIgnoreCase(scope) && scheduleToCancel.getRecurrenceId() != null) {
+        List<ScheduleStatus> statusesToCancel = Arrays.asList(ScheduleStatus.SCHEDULED, ScheduleStatus.IN_PROGRESS);
+        List<Schedule> entireSeries = scheduleRepository.findByRecurrenceIdAndStatusIn(
+            scheduleToCancel.getRecurrenceId(), 
+            statusesToCancel
+        );
+        for (Schedule schedule : entireSeries) {
+            updateScheduleStatus(schedule.getId(), ScheduleStatus.CANCELLED, scope);
+        } 
+    } else {
+      updateScheduleStatus(scheduleToCancel.getId(), ScheduleStatus.CANCELLED, scope);
+    }
   }
 
   @Transactional
@@ -158,6 +204,11 @@ public class ScheduleService {
 
   @Transactional
   public ScheduleDTO updateScheduleStatus(Long scheduleId, ScheduleStatus newStatus) {
+    return updateScheduleStatus(scheduleId, newStatus, "SINGLE");
+  }
+
+  @Transactional
+  public ScheduleDTO updateScheduleStatus(Long scheduleId, ScheduleStatus newStatus, String scope) {
       
       
       Schedule schedule = scheduleRepository.findById(scheduleId)
@@ -180,7 +231,7 @@ public class ScheduleService {
                   throw new RuntimeException("Responsável (Guardian) não encontrado para o aluno: " + student.getName());
               }
 
-              Map<String, Object> payload = buildN8nCancellationPayload(teacher, student, guardian, updatedSchedule);
+              Map<String, Object> payload = buildN8nCancellationPayload(teacher, student, guardian, updatedSchedule, scope);
 
               HttpHeaders headers = new HttpHeaders();
               headers.setContentType(MediaType.APPLICATION_JSON);
@@ -200,7 +251,7 @@ public class ScheduleService {
       return convertToDTO(updatedSchedule);
   }
 
-  private Map<String, Object> buildN8nCancellationPayload(User teacher, Student student, User guardian, Schedule schedule) {
+  private Map<String, Object> buildN8nCancellationPayload(User teacher, Student student, User guardian, Schedule schedule, String scope) {
       Map<String, Object> payload = new HashMap<>();
       
       Map<String, Object> teacherMap = new HashMap<>();
@@ -221,6 +272,8 @@ public class ScheduleService {
       eventDetailsMap.put("start_time_iso", schedule.getStartTime().toString());
       eventDetailsMap.put("title", "Aula " + student.getName());
       payload.put("event_details", eventDetailsMap);
+
+      payload.put("scope", scope);
 
       return payload;
   }
@@ -253,6 +306,8 @@ public class ScheduleService {
     dto.setModality(schedule.getModality());
     dto.setSubject(schedule.getSubject());
     dto.setDescription(schedule.getDescription());
+    dto.setRecurrenceType(schedule.getRecurrenceType());
+    dto.setRecurrenceId(schedule.getRecurrenceId());
     return dto;
   }
 }
