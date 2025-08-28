@@ -37,7 +37,7 @@ public class Schedule {
   @Column(nullable = false)
   private LocalDateTime endTime;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String subject;
 
   @Column

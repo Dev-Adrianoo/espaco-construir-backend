@@ -147,8 +147,27 @@ public class ScheduleService {
             updateScheduleStatus(schedule.getId(), ScheduleStatus.CANCELLED, scope);
         } 
     } else {
-      updateScheduleStatus(scheduleToCancel.getId(), ScheduleStatus.CANCELLED, scope);
+
+      if(scheduleToCancel.getRecurrenceId() != null && scheduleToCancel.getRecurrenceType() == RecurrenceType.WEEKLY) {
+
+      Schedule nextOccurrence = new Schedule();
+
+      nextOccurrence.setStudent(scheduleToCancel.getStudent());
+      nextOccurrence.setTeacher(scheduleToCancel.getTeacher());
+      nextOccurrence.setStartTime(scheduleToCancel.getStartTime().plusWeeks(1));
+      nextOccurrence.setEndTime(scheduleToCancel.getEndTime().plusWeeks(1));
+      nextOccurrence.setStatus(ScheduleStatus.SCHEDULED);
+      nextOccurrence.setModality(scheduleToCancel.getModality());
+      nextOccurrence.setRecurrenceId(scheduleToCancel.getRecurrenceId());
+      nextOccurrence.setRecurrenceType(scheduleToCancel.getRecurrenceType());
+      nextOccurrence.setDifficulties(scheduleToCancel.getDifficulties());
+      nextOccurrence.setCondition(scheduleToCancel.getCondition());
+      
+      scheduleRepository.save(nextOccurrence);
+
     }
+      updateScheduleStatus(scheduleToCancel.getId(), ScheduleStatus.CANCELLED, "SINGLE");
+   }
   }
 
   @Transactional

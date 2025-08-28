@@ -126,9 +126,12 @@ public class ScheduleController {
         return ResponseEntity.ok((createdSchedules));
     }
 
-    @PostMapping("/cancel")
+    @PutMapping("/cancel")
     public ResponseEntity<Void> cancelBooking(@RequestBody CancellationRequestDTO cancellationRequest) {
+        System.out.println("LOG-CONTROLLER: Entrou no método cancelBooking do ScheduleController.");
+        System.out.println("LOG-BACKEND: A requisição chegou em /api/schedules/cancel");
         scheduleService.cancelBooking(cancellationRequest);
+        System.out.println("LOG-CONTROLLER: Saindo do método cancelBooking do ScheduleController.");
         return ResponseEntity.ok().build();
     }
 
