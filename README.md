@@ -96,7 +96,7 @@ O projeto suporta configuração via variáveis de ambiente:
 | `JPA_FORMAT_SQL`  | `true`                                                             | Formatar SQL no console   |
 | `FLYWAY_ENABLED`  | `true`                                                             | Habilitar Flyway          |
 | `SERVER_PORT`     | `8081`                                                             | Porta da aplicação        |
-| `JWT_SECRET`      | `404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970` | Chave secreta JWT         |
+| `JWT_SECRET`      | `defina no .env` | Chave secreta JWT         |
 | `JWT_EXPIRATION`  | `86400000`                                                         | Expiração do token (24h)  |
 | `ALLOWED_ORIGINS` | `http://localhost:5173`                                            | CORS - origens permitidas |
 
@@ -349,5 +349,3 @@ Se precisar de ajuda:
 2. Verifique os logs da aplicação
 3. Pergunte para o time
 4. Verifique o histórico de commits
-
-Você está aprendendo, não desista! 🚀
